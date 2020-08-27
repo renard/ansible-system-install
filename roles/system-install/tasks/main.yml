@@ -38,21 +38,15 @@
 
 # Pseudo filesystems are required for grub operations and some package
 # installations.
+#
+# TODO: explain why ansible mount cannot be used.
 - name: mount pseudo file systems
   command:
     mount -o bind '{{ item.fs }}' '{{ system_install_target }}/{{ item.fs }}'
   args:
     creates: '{{ system_install_target }}/{{ item.fs }}/{{ item.creates }}'
     warn: false
-  with_items:
-    - fs: /proc
-      creates: devices
-    - fs: /dev
-      creates: disk
-    - fs: /dev/pts
-      creates: ptmx
-    - fs: /run
-      creates: sshd
+  with_items: '{{ system_install_pseudo_fs }}'
 
 # Allows name resolving in the chroot environment. This is only required for
 # operations in the chroot.

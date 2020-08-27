@@ -12,3 +12,24 @@
 system_install_debootstrap_scripts:
   - { dist: eoan, def: gutsy }
   - { dist: focal, def: gutsy }
+
+## Pseudo filesystems to mount into the chroot.
+#
+# Pseudo filesystems are mount using the bind option from the live
+# system to the target chroot. They are required to execute specific
+# tasks such as installing grub ou starting ssh server.
+#
+# fs:      is the path to the pseudo filesystem in the live system.
+# creates: is an existing file relative to fs used to check if fs is
+#          mounted.
+#
+# There is no reason to change this value.
+system_install_pseudo_fs:
+  - fs: /dev
+    creates: disk
+  - fs: /dev/pts
+    creates: ptmx
+  - fs: /proc
+    creates: devices
+  - fs: /run
+    creates: sshd

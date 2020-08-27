@@ -41,13 +41,9 @@
 
     - name: umount pseudo file systems from the chroot target
       mount:
-        path: '{{ system_install_target }}/{{ item }}'
+        path: '{{ system_install_target }}/{{ item.fs }}'
         state: unmounted
-      with_items:
-        - /dev/pts
-        - /run
-        - /proc
-        - /dev
+      with_items: '{{ system_install_pseudo_fs | reverse | list }}'
 
     # in case previous installation failed
     - name: unmount target partition

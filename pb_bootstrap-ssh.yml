@@ -3,7 +3,7 @@
 # Copyright © 2020 Sébastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 
 # Created: 2020-02-20
-# Last changed: 2020-08-27 17:40:16
+# Last changed: 2020-08-28 01:08:01
 
 # This program is free software. It comes without any warranty, to
 # the extent permitted by applicable law. You can redistribute it
@@ -66,6 +66,7 @@
       set_fact:
         system_install_target: '{{ system_install_target }}'
         system_install_partitions: '{{ system_install_partitions }}'
+        system_install_pseudo_fs: '{{ system_install_pseudo_fs }}'
 
     # SSH server keys are not created by default on Centos
     - name: create ssh server keys (Centos like)
@@ -185,13 +186,9 @@
         
     - name: umount pseudo file systems from the chroot target
       mount:
-        path: '{{ system_install_target }}/{{ item }}'
+        path: '{{ system_install_target }}/{{ item.fs }}'
         state: unmounted
-      with_items:
-        - /dev/pts
-        - /run  
-        - /proc
-        - /dev
+      with_items: '{{ system_install_pseudo_fs | reverse | list }}'
         
     - name: Unmount target partition
       mount:
