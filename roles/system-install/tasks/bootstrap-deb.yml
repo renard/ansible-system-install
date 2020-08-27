@@ -1,0 +1,43 @@
+
+- name: install required packages
+  apt:
+    pkg:
+      - debootstrap
+    update_cache: yes
+    install_recommends: no
+    cache_valid_time: 3600
+
+- name: Link recent distributions
+  file:
+    src: '{{ item.def }}'
+    dest: '/usr/share/debootstrap/scripts/{{ item.dist }}'
+    state: link
+  with_items: '{{ system_install_debootstrap_scripts }}'
+
+- name: Process generic variables (debian)
+  set_fact:
+    _system_install_apt_mirror: '{{ system_install_debian_apt_mirror }}'
+    _system_install_apt_release: '{{ system_install_debian_apt_release }}'
+    _system_install_apt_components: '{{ system_install_debian_apt_components }}'
+    _system_install_kernel_packages: '{{ system_install_debian_kernel_packages }}'
+  when: system_install_vendor == 'debian'
+    
+- name: Process generic variables (ubuntu)
+  set_fact:
+    _system_install_apt_mirror: '{{ system_install_ubuntu_apt_mirror }}'
+    _system_install_apt_release: '{{ system_install_ubuntu_apt_release }}'
+    _system_install_apt_components: '{{ system_install_ubuntu_apt_components }}'
+    _system_install_kernel_packages: '{{ system_install_ubuntu_kernel_packages }}'
+  when: system_install_vendor == 'ubuntu'
+
+
+- name: Bootstrap system. This might take time.
+  command: |-
+    debootstrap \
+    --arch '{{ system_install_arch }}' \
+    --components '{{ _system_install_apt_components | join(",") }}' \
+    --include='{{ (system_install_additional_packages + _system_install_kernel_packages) | join(",") }}'
+    '{{ _system_install_apt_release }}' '{{ system_install_target }}' \
+    '{{ _system_install_apt_mirror }}'
+  args:
+    creates: '{{ system_install_target }}/etc'

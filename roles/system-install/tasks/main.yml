@@ -1,0 +1,82 @@
+---
+
+- include: harddrive.yml
+
+
+    
+- include: bootstrap-centos.yml
+  when:
+    system_install_vendor in ['centos']
+    and (
+      system_install_base is not defined
+      or system_install_base == omit
+      or system_install_base == '')
+
+- include: bootstrap-opensuse.yml
+  when:
+    system_install_vendor in ['opensuse']
+    and (
+      system_install_base is not defined
+      or system_install_base == omit
+      or system_install_base == '')
+    
+- include: bootstrap-deb.yml
+  when:
+    system_install_vendor in [ 'debian', 'ubuntu' ]
+    and (
+      system_install_base is not defined
+      or system_install_base == omit
+      or system_install_base == '')
+
+- include: base.yml
+  when:
+    system_install_base is defined
+    and system_install_base != omit
+    and system_install_base != ''
+
+- include: root-access.yml
+
+# Pseudo filesystems are required for grub operations and some package
+# installations.
+- name: mount pseudo file systems
+  command:
+    mount -o bind '{{ item.fs }}' '{{ system_install_target }}/{{ item.fs }}'
+  args:
+    creates: '{{ system_install_target }}/{{ item.fs }}/{{ item.creates }}'
+    warn: false
+  with_items:
+    - fs: /proc
+      creates: devices
+    - fs: /dev
+      creates: disk
+    - fs: /dev/pts
+      creates: ptmx
+    - fs: /run
+      creates: sshd
+
+# Allows name resolving in the chroot environment. This is only required for
+# operations in the chroot.
+- name: ensure /run/resolvconf exists
+  file:
+    path: /run/resolvconf
+    state: directory
+
+- name: copy /etc/resolv.conf to /run/resolvconf
+  copy:
+    src: /etc/resolv.conf
+    dest: /run/resolvconf
+    remote_src: yes
+
+# Copy 
+- name: copy /etc/resolv.conf to chroot (Centos like)
+  copy:
+    src: /etc/resolv.conf
+    dest: '{{ system_install_target }}/etc/resolv.conf'
+    remote_src: yes
+  when: system_install_vendor in [ 'centos' ]
+
+    
+- include: grub.yml    
+
+- include: post-install-fix.yml
+

@@ -1,0 +1,285 @@
+## System to install
+
+#
+# Select archictecture. Use amd64 or change to a specific architecture if
+# you know what you are doing.
+#
+system_install_arch: amd64
+
+## Linux vendor
+#
+# Can be either debian or ubuntu.
+#
+system_install_vendor: ubuntu
+
+
+# Setup for Ubuntu
+system_install_ubuntu_apt_mirror: 'http://fr.archive.ubuntu.com/ubuntu/'
+system_install_ubuntu_apt_release: eoan
+system_install_ubuntu_apt_components:
+  - main
+  - restricted
+  - universe
+  - multiverse
+system_install_ubuntu_kernel_packages:
+  - linux-image-generic
+  - grub-ipxe
+
+# Setup for Debian
+system_install_debian_apt_mirror: 'http://deb.debian.org/debian'
+system_install_debian_apt_release: buster
+system_install_debian_apt_components:
+  - main
+  - contrib
+  - non-free
+system_install_debian_kernel_packages:
+  - ipxe
+  - firmware-linux-free
+  - firmware-linux-nonfree
+  - firmware-bnx2
+  - firmware-bnx2x
+  - linux-image-amd64
+
+## Extra packages to be installed with debootstrap.
+#
+system_install_additional_packages:
+  ## Following package are not installed by default on Ubuntu  
+  # Needed to create initrd.img
+  - initramfs-tools
+  ## End of Ubuntu missing packages
+  # Needed for name resolution in chroot
+  - resolvconf
+  # Needed to create /etc/network directory
+  - ifupdown
+  #
+  - xfsprogs
+  - lvm2
+  - openssh-server
+  - grub-pc
+  # - python
+  - python3-apt
+  - cryptsetup
+  - busybox
+  - dropbear
+  - lsb-release
+  - mdadm
+  - isc-dhcp-client
+
+
+###
+### CentOS
+###
+
+  
+## centos version and architechtures
+system_install_centos_version: 7
+system_install_centos_arch: x86_64
+
+## Mirror to use
+system_install_centos_mirror: 'http://mirror.centos.org'
+
+
+## Base URLs for the repo file.
+#
+# name: is the repository name used by yum. It will be prefixed by
+#       "bootstrap-" to easilly enable it with yum command.
+# baseurl: the repository base URL.
+# versions: versions to which this repository applies.
+#
+system_install_centos_repositories:
+  # Base system
+  - name: BaseOS
+    baseurl: '{{ system_install_centos_mirror }}/centos/{{ system_install_centos_version }}/BaseOS/{{ system_install_centos_arch }}/os/'
+    versions:
+      - 8
+  # Python
+  - name: AppStream
+    baseurl: '{{ system_install_centos_mirror }}/centos/{{ system_install_centos_version }}/AppStream/{{ system_install_centos_arch }}/os/'
+    versions:
+      - 8
+
+  # Base system
+  - name: os
+    baseurl: '{{ system_install_centos_mirror }}/centos/{{ system_install_centos_version }}/os/{{ system_install_centos_arch }}'
+    versions:
+      - 7
+
+system_install_centos_gpg_keys_urls:
+  - https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official
+  - https://www.centos.org/keys/RPM-GPG-KEY-CentOS-7
+
+system_install_centos_packages:
+  - bash
+  - yum
+  - yum-utils
+  - rootfiles
+  - sudo
+  - kernel
+  - xfsprogs
+  - grub2-pc
+  - dhcp-client
+  - network-scripts
+  - openssh-server
+  - openssh-clients
+  - NetworkManager
+  # https://unix.stackexchange.com/questions/442698/when-i-log-in-it-hangs-until-crng-init-done
+  - rng-tools
+  # Python for ansible
+  - python38
+  # Centos 7
+  - python3
+  - python3-libselinux
+
+
+###
+### OpenSUSE
+###
+
+## opensuse version and architechtures
+#
+# See http://download.opensuse.org/distribution/
+system_install_opensuse_version: stable
+system_install_opensuse_arch: x86_64
+
+## Mirror to use
+system_install_opensuse_mirror: 'http://download.opensuse.org'
+
+## Base URLs for the repo file.
+#
+# name: is the repository name used by yum. It will be prefixed by
+#       "bootstrap-" to easilly enable it with yum command.
+# baseurl: the repository base URL.
+# versions: versions to which this repository applies.
+#
+system_install_opensuse_repositories:
+  # Base system
+  - name: BaseOS
+    repo: '{{ system_install_opensuse_mirror }}/distribution/{{ system_install_opensuse_version }}/repo/oss'
+    versions:
+      - stable
+  # # Python
+  # - name: AppStream
+  #   baseurl: '{{ system_install_opensuse_mirror }}/opensuse/{{ system_install_opensuse_version }}/AppStream/{{ system_install_opensuse_arch }}/os/'
+  #   versions:
+  #     - 8
+
+  # # Base system
+  # - name: os
+  #   baseurl: '{{ system_install_opensuse_mirror }}/opensuse/{{ system_install_opensuse_version }}/os/{{ system_install_opensuse_arch }}'
+  #   versions:
+  #     - 7
+
+
+system_install_opensuse_packages:
+  - bash
+  - rpm
+  - zypper
+  - yum
+  - yum-utils
+  - wget
+  #- rootfiles
+  - sudo
+  - kernel
+  - xfsprogs
+  - grub2-i386-pc
+  - dhcp-client
+  #- network-scripts
+  - openssh
+  #- openssh-server
+  #- openssh-clients
+  - NetworkManager
+  # https://unix.stackexchange.com/questions/442698/when-i-log-in-it-hangs-until-crng-init-done
+  - rng-tools
+  # Python for ansible
+  #- python38
+  # Centos 7
+  - python3
+  #- python3-libselinux
+
+  
+
+
+
+  
+## Network interface for DHCP
+system_install_network_iface: eth0
+
+## Grub setup
+#
+# This will setup GRUB_CMDLINE_LINUX_DEFAULT.
+#
+# By default run in verbose mode and make sure traditional ethX names are
+# used for network interfaces.
+system_install_grub_linux_default:
+  - verbose
+  - 'net.ifnames=0'
+  
+
+## Root user credentials
+#
+# Deploy root credentials. Password is strongly dicouraged in favor of ssh
+# key.
+#
+# system_install_root_ssh_keys is a list of ssh keys to deploy for root
+# user.
+#
+# system_install_root_password is the root password. If not defined no
+# password will be used for the root user preventing from loging (default).
+#
+# At least one method must be defined to process the 2nd stage of the system
+# installation. The ssh keys method being the prefered one.
+#
+#system_install_root_password:
+#
+#system_install_root_ssh_keys:
+
+  
+## Disk to install the system to.
+#
+# The system will be installed on this hard drive. If not defined the first
+# drive found by list-hard-drives will be used.
+#
+# BE CAREFUL ALL DATA ON THIS DRIVE WILL BE LOST!
+#
+# system_install_drive: /dev/vda
+
+
+## Target mount 
+#
+# Path to mount the disk.
+#
+system_install_target: /srv
+
+## Skip hard drive partition
+#
+# If set to true, all hardrive partitionning and formating will be skipped.
+#
+system_install_skip_partition: true
+
+## Partition scheme
+#
+# By default install the system in the whole disk. See ansible "parted"
+# module and parted(1) manpage for further details.
+#
+# This setup works in most cases but YMMV.
+system_install_partitions:
+  - name: OS
+    number: 1
+    part_start: 4096s
+    part_end: 100%
+    flags:
+      - boot
+      - esp
+    filesystem:
+      force: yes
+      fstype: xfs
+      opts: -L SYSTEM
+    mount:
+      path: /
+  - name: grub
+    number: 2
+    part_start: 2048s
+    part_end: 4095s
+    flags:
+      - bios_grub
+      

@@ -1,0 +1,211 @@
+#!/usr/bin/env ansible-playbook
+
+# Copyright © 2020 Sébastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
+
+# Created: 2020-02-20
+# Last changed: 2020-08-27 17:40:16
+
+# This program is free software. It comes without any warranty, to
+# the extent permitted by applicable law. You can redistribute it
+# and/or modify it under the terms of the Do What The Fuck You Want
+# To Public License, Version 2, as published by Sam Hocevar. See
+# http://sam.zoy.org/wtfpl/COPYING for more details.
+
+
+# This ansible playbook bootstraps a new Debian like server.
+#
+# Invokation:
+#
+#    ./pb_bootstrap-ssh.yml -u user -l host -e password=debian
+#
+# Requirements:
+#
+#  * A Debian-like machine with network access (you can use a live-cd if you
+#    want).
+#  * A ssh access (Debian live-cd do not provide it) with root privileges
+#    (sudo will do).
+#  * The new server has to be declared within a 'install' group in the
+#    inventory. To prevent from doing bad things do not forget to remove the
+#    server from this group after setup completed.
+#
+#
+# Setup is run in 3 stages:
+#
+#   - Install system (debootstrap or a tarball image).
+#   - Customize the system (credentials, base packages, ...)
+#   - Cleanup the install and unmount all filesystems.
+#
+# You need to reboot the remote server yourself.
+#
+
+- hosts: 'install'
+  become_user: root
+  become_method: sudo
+  # Become is needed for this tasks
+  become: '{{ become | default(True) }}'
+  gather_facts: yes
+  
+  vars:
+    ansible_ssh_pass: '{{ password | default(omit) }}'
+    host_key_checking: '{{ host_key_checking | default(False) }}'
+    ## Use a pre-generated installation
+    #
+    # If defined, download a tarball of a system install instead of using
+    # debootstrap. This method is much more faster but requires an existing
+    # image.
+    #
+    # This variable can be passed using the -e option or set in host
+    # variables.
+    #
+    # system_install_base: []
+
+  post_tasks:
+    # Variables are not available between diffrent plays but those stored
+    # using set_fact. Some of them are required later.
+    - name: store persistant facts
+      set_fact:
+        system_install_target: '{{ system_install_target }}'
+        system_install_partitions: '{{ system_install_partitions }}'
+
+    # SSH server keys are not created by default on Centos
+    - name: create ssh server keys (Centos like)
+      command: |-
+        chroot '{{ system_install_target }}' ssh-keygen \
+        -f '/etc/ssh/ssh_host_{{ item }}_key' -N '' -t '{{ item }}'
+      args:
+        creates: '{{ system_install_target }}/etc/ssh/ssh_host_{{ item }}_key'
+      when: system_install_vendor in [ 'centos', 'opensuse' ]
+      with_items:
+        - rsa
+        - ecdsa
+        - ed25519
+        
+
+        
+    # Start ssh server in the chroot to allow the 2nd stage setup
+    - name: start ssh server in chroot
+      command: |-
+        chroot '{{ system_install_target }}' /usr/sbin/sshd -p 2222 \
+        -o PidFile=/run/ssh-chroot.pid
+        
+  roles:
+    # Install the machine. See system-install role for more customization.
+    - { role: system-install, tags: system-install }
+
+## Second stage
+#
+# This part is run within the remote chroot. Since Ansible is not able to
+# daisy-chain connection, a ssh server has been started in the chroot and
+# listens for connections on port 2222 by default.
+#
+# If any role has to be played, see the roles section below.
+#
+- hosts: 'install'
+  user: 'root'
+  become_user: root
+  become_method: sudo
+  # Become is needed for this tasks
+  become: '{{ become | default(True) }}'
+  gather_facts: yes
+
+  vars:
+    ansible_ssh_port: '{{ ssh_port | default(2222) }}'
+    host_key_checking: '{{ host_key_checking | default(False) }}'
+    ansible_python_interpreter: '/usr/bin/python3'
+
+  # Configure roles that suit your need here. 
+  roles:
+    # - { role: apt, tags: apt }
+    # - { role: etckeeper, tags: etckeeper }
+    #- { role: system-install-fix, tags: system-install-fix }
+    - { role: base, tags: base }
+    # - { role: credentials, tags: credentials }
+    # - { role: isc-dhcp-client, tags: isc-dhcp-client }
+
+  post_tasks:
+
+    # In OpenSUSE sshd is not enabled by default at boot time.
+    - name: Enable systemd sshd
+      command:
+        /usr/bin/systemctl enable sshd
+      when: system_install_vendor in ['opensuse' ]
+    
+    # By default SELinux is enabled and prevent from login via
+    # ssh. For now we don't need it to be enabled.
+    #
+    # If SELinux should be enabled, use an other role for that.
+    - name: Disable SELinux
+      lineinfile:
+        dest: '/etc/selinux/config'
+        line: 'SELINUX=disabled'
+        regexp: '^\s*SELINUX\s*=.*'
+      when: system_install_vendor in [ 'centos' ]
+    
+
+## Third stage
+#
+# Cleanup the ssh server from the chroot and unmount all pseudo file
+# systems.
+#
+- hosts: 'install'
+  become_user: root
+  become_method: sudo
+  # Become is needed for this tasks
+  become: '{{ become | default(True) }}'
+  gather_facts: no
+
+  vars:
+    ansible_ssh_pass: '{{ password | default(omit) }}'
+    host_key_checking: '{{ host_key_checking | default(False) }}'
+
+  post_tasks:
+    
+    - name: Remove sshkeys for root in the chroot
+      authorized_key:
+        user: root
+        path: '{{ system_install_target }}/root/.ssh/authorized_keys'
+        key: '{{ item }}'
+        state: absent
+      with_items: '{{ system_install_root_ssh_keys | default([]) }}'
+      when: system_install_remove_root_keys
+
+    # ssh multiplex process is still running in chroot. Kill it before
+    # stopping the ssh server otherwise /dev would not be able to unmounted.
+    - name: Stop ssh connections in chroot
+      shell:
+        pkill -P $(cat /run/ssh-chroot.pid)
+
+    # Now kill the chrooted ssh server
+    - name: Stop ssh server in chroot
+      command:
+        pkill -F /run/ssh-chroot.pid
+        
+    - name: umount pseudo file systems from the chroot target
+      mount:
+        path: '{{ system_install_target }}/{{ item }}'
+        state: unmounted
+      with_items:
+        - /dev/pts
+        - /run  
+        - /proc
+        - /dev
+        
+    - name: Unmount target partition
+      mount:
+        src: '{{ system_install_drive }}{{ item.number }}'
+        path: '{{ system_install_target }}/{{ item.mount.path }}'
+        fstype: '{{ item.filesystem.fstype }}'
+        state: unmounted
+      when:
+        item.mount is defined
+        and item.filesystem is defined
+      with_items: '{{ system_install_partitions }}'
+
+    - name: Reboot message
+      debug:
+        msg: |
+          Now you can reboot {{ inventory_hostname }} and run next pb_base.yml playbook.
+
+            ssh {{ inventory_hostname }} sudo reboot
+            ./pb_base.yml -l {{ inventory_hostname }}
+    

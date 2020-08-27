@@ -1,0 +1,62 @@
+---
+
+# On debian
+- name: Install required packages (debian)
+  apt:
+    pkg: zypper
+    install-recommends: no
+    update_cache: yes
+    cache_valid_time: 3600
+
+# Zypper repository canno be add in the chroot target using
+# zypper_repository.
+- name: deploy zypper source file
+  command: |-
+    zypper \
+    --root '{{ system_install_target }}' \
+    addrepo '{{ item.repo }}' \
+    'bootstrap-{{ item.name }}'
+  args:
+    creates: '{{ system_install_target }}/etc/zypp/repos.d/bootstrap-{{ item.name }}.repo'
+    warn: false
+  with_items: '{{ system_install_opensuse_repositories }}'
+    
+    
+
+
+# - name: deploy zypper source file
+#   zypper_repository:
+#     name: 'bootstrap-{{ item.name }}'
+#     description: bootsrap OpenSUSE
+#     repo: '{{ item.repo }}'
+#     #reposdir: /tmp
+#     #repo: /tmp/bootstrap
+#     #gpgcheck: 1
+#     #gpgkey: '{{ item.gpgkey | default(system_install_opensuse_gpg_keys_urls) }}'
+#   # when: system_install_opensuse_version in item.versions
+#   with_items: '{{ system_install_opensuse_repositories }}'
+    
+# yum command cannot be run on Debian system:
+# pkg_mgr: apt
+# msg: 'Unsupported parameters for (apt) module: ...
+#
+# yum should be manually run to bootstrap CentOS
+- name: install base system
+  command: |-
+    zypper --no-gpg-checks \
+    --non-interactive \
+    --root '{{ system_install_target }}' \
+    install {{ system_install_opensuse_packages | join(" ") }}
+  args:
+    creates: '{{ system_install_target }}/root'
+    warn: false
+
+# - name: Configure yum vars
+#   copy:
+#     dest: '{{ system_install_target }}/{{ item.dest }}'
+#     content: '{{ item.content }}'
+#   with_items:
+#     - dest: /etc/yum/vars/releasever
+#       content: '{{ system_install_opensuse_version }}'
+#     - dest: /etc/yum/vars/basearch
+#       content: '{{ system_install_opensuse_arch }}'

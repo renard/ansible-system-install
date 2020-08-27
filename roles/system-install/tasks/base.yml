@@ -1,0 +1,7 @@
+- name: install system from base url
+  shell: >-
+    curl '{{ system_install_base }}'
+    | tar -C /srv --xattrs --xattrs-include '*' --selinux -xzf -
+  args:
+    warn: false
+

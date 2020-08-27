@@ -1,0 +1,67 @@
+
+# Ensure fstab is set correctly to allow system boot.
+- name: Setup fstab in chroot
+  mount:
+    src: '{{ system_install_drive }}{{ item.number }}'
+    path: '{{ item.mount.path }}'
+    fstype: '{{ item.filesystem.fstype }}'
+    fstab: '{{ system_install_target }}/etc/fstab'
+    state: present
+  when:
+    item.mount is defined
+    and item.filesystem is defined
+  with_items: '{{ system_install_partitions }}'
+
+# Configure DHCP on the primary network interface.
+- name: Deploy network interface file (Debian like)
+  template:
+    src: etc/network/interfaces
+    dest: '{{ system_install_target }}/etc/network/interfaces'
+    owner: root
+    group: root
+    mode: '0644'
+  when: system_install_vendor in [ 'debian', 'ubuntu' ]
+
+
+- name: Deploy network interface file (Centos like)
+  block:
+    
+    - name: Configure network (Centos like)
+      copy:
+        dest: '{{ system_install_target }}//etc/sysconfig/network-scripts/ifcfg-eth0'
+        content: |-
+          BOOTPROTO="dhcp"
+          ONBOOT="yes"
+      when: system_install_vendor in [ 'centos' ]
+
+    - name: Configure network (OpenSUSE like)
+      copy:
+        dest: '{{ system_install_target }}//etc/sysconfig/network/ifcfg-eth0'
+        content: |-
+          BOOTPROTO='dhcp'
+          STARTMODE='auto'
+      when: system_install_vendor in [ 'opensuse' ]
+    
+    - name: Configure network (Centos like)
+      copy:
+        dest: '{{ system_install_target }}/etc/sysconfig/network'
+        content: |-
+            # Auto generated
+      when: system_install_vendor in [ 'centos' ]
+
+    ## Dbus could not find its runtime directory.
+    #
+    # See
+    #  - https://bugzilla.redhat.com/show_bug.cgi?id=1568856
+    #  - https://unix.stackexchange.com/questions/523250/dbus-issues-unable-to-connect
+    - name: Fix NetworkManager link
+      command:
+        ln -s /run/dbus '{{ system_install_target }}/var/run/dbus'
+      args:
+        creates: '{{ system_install_target }}/var/run/dbus'
+        warn: false
+        
+  when: system_install_vendor in [ 'centos', 'opensuse' ]
+
+  
+

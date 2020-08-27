@@ -1,0 +1,14 @@
+## Add debootstrap scripts for recent distributions
+#
+# Debootstrap is not always up-to-date. Create links to support recent
+# distros.
+#
+# - dist: distibution name
+# - def: distribution definition (link to this file)
+#
+# Rule of thumb: use sid for Debian and gutsy for Ubuntu. See
+# /usr/share/debootstrap/scripts.
+#
+system_install_debootstrap_scripts:
+  - { dist: eoan, def: gutsy }
+  - { dist: focal, def: gutsy }

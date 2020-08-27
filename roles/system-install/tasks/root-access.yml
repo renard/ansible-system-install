@@ -1,0 +1,21 @@
+---
+
+# Fix ssh configuration that prevent root login with password.
+- name: Allow root to login
+  lineinfile:
+    dest: '{{ system_install_target }}/etc/ssh/sshd_config'
+    regexp: '^(# *)?PermitRootLogin .*'
+    line: 'PermitRootLogin yes'
+    backrefs: no
+
+- name: Set root password
+  shell:
+    echo 'root:{{ system_install_root_password }}' | chroot '{{ system_install_target }}' chpasswd
+  when: system_install_root_password is defined
+
+- name: deploy ssh key for root
+  authorized_key:
+    user: root
+    path: '{{ system_install_target }}/root/.ssh/authorized_keys'
+    key: '{{ item }}'
+  with_items: '{{ system_install_root_ssh_keys | default([]) }}'
