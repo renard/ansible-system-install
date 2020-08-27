@@ -134,12 +134,15 @@
     # ssh. For now we don't need it to be enabled.
     #
     # If SELinux should be enabled, use an other role for that.
-    - name: Disable SELinux
-      lineinfile:
-        dest: '/etc/selinux/config'
-        line: 'SELINUX=disabled'
-        regexp: '^\s*SELINUX\s*=.*'
-      when: system_install_vendor in [ 'centos' ]
+    - block:
+        - name: Disable SELinux
+          lineinfile:
+            dest: '/etc/selinux/config'
+            line: 'SELINUX=disabled'
+            regexp: '^\s*SELINUX\s*=.*'
+      when:
+        system_install_vendor in [ 'centos' ]
+        and '/etc/selinux/config' is exists
     
 
 ## Third stage
