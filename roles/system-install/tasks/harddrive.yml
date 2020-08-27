@@ -39,6 +39,16 @@
         device: '{{ system_install_drive }}'
       register: _system_install_partitions
 
+    - name: umount pseudo file systems from the chroot target
+      mount:
+        path: '{{ system_install_target }}/{{ item }}'
+        state: unmounted
+      with_items:
+        - /dev/pts
+        - /run
+        - /proc
+        - /dev
+
     # in case previous installation failed
     - name: unmount target partition
       mount:
