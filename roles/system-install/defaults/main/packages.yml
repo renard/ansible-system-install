@@ -109,3 +109,5 @@ system_install_packages:
     os: [ 'centos', 'opensuse' ]
   - pkg: python3-libselinux
     os: [ 'centos' ]
+  - pkg: dnf
+    os: [ 'centos' ]
