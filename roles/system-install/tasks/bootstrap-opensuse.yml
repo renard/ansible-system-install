@@ -8,8 +8,8 @@
     update_cache: yes
     cache_valid_time: 3600
 
-# Zypper repository canno be add in the chroot target using
-# zypper_repository.
+# Zypper repository does not support a specific file destination so it
+# cannot be added in the chroot target using zypper_repository.
 - name: deploy zypper source file
   command: |-
     zypper \
@@ -21,20 +21,6 @@
     warn: false
   with_items: '{{ system_install_opensuse_repositories }}'
     
-    
-
-
-# - name: deploy zypper source file
-#   zypper_repository:
-#     name: 'bootstrap-{{ item.name }}'
-#     description: bootsrap OpenSUSE
-#     repo: '{{ item.repo }}'
-#     #reposdir: /tmp
-#     #repo: /tmp/bootstrap
-#     #gpgcheck: 1
-#     #gpgkey: '{{ item.gpgkey | default(system_install_opensuse_gpg_keys_urls) }}'
-#   # when: system_install_opensuse_version in item.versions
-#   with_items: '{{ system_install_opensuse_repositories }}'
     
 # yum command cannot be run on Debian system:
 # pkg_mgr: apt
