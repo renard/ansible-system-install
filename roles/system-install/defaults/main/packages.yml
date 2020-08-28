@@ -1,3 +1,11 @@
+## List all packages to be installed
+#
+# Each item is a dict with following keys:
+#
+#  - pkg: the package name
+#  - os: a list of OS the package should be installed to. It should
+#        reflect system_install_vendor.
+#
 system_install_packages:
   ## kernel packages
   - pkg: ipxe
