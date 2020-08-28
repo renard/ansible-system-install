@@ -12,14 +12,14 @@
     ].pkg") | list
     }}'
 
-- include: bootstrap-centos.yml
+- include_tasks: bootstrap-centos.yml
   when: system_install_vendor in ['centos']
 
-- include: bootstrap-opensuse.yml
+- include_tasks: bootstrap-opensuse.yml
   when: system_install_vendor in ['opensuse']
     
-- include: bootstrap-debian.yml
+- include_tasks: bootstrap-debian.yml
   when: system_install_vendor in [ 'debian', 'ubuntu' ]
 
-- include: bootstrap-alpine.yml
+- include_tasks: bootstrap-alpine.yml
   when: system_install_vendor == 'alpine'
