@@ -1,0 +1,10 @@
+---
+
+- include: bootstrap-centos.yml
+  when: system_install_vendor in ['centos']
+
+- include: bootstrap-opensuse.yml
+  when: system_install_vendor in ['opensuse']
+    
+- include: bootstrap-deb.yml
+  when: system_install_vendor in [ 'debian', 'ubuntu' ]

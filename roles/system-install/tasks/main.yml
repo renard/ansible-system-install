@@ -2,29 +2,9 @@
 
 - include: harddrive.yml
 
-
-    
 - include: bootstrap-centos.yml
   when:
-    system_install_vendor in ['centos']
-    and (
-      system_install_base is not defined
-      or system_install_base == omit
-      or system_install_base == '')
-
-- include: bootstrap-opensuse.yml
-  when:
-    system_install_vendor in ['opensuse']
-    and (
-      system_install_base is not defined
-      or system_install_base == omit
-      or system_install_base == '')
-    
-- include: bootstrap-deb.yml
-  when:
-    system_install_vendor in [ 'debian', 'ubuntu' ]
-    and (
-      system_install_base is not defined
+    system_install_base is not defined
       or system_install_base == omit
       or system_install_base == '')
 
