@@ -153,6 +153,8 @@
 
   post_tasks:
 
+    ## TODO: move these tasks into system-install / fix.
+    
     # In OpenSUSE sshd is not enabled by default at boot time.
     - name: Enable systemd sshd
       command:
@@ -191,7 +193,7 @@
     host_key_checking: '{{ host_key_checking | default(False) }}'
 
   post_tasks:
-    
+
     - name: Remove sshkeys for root in the chroot
       authorized_key:
         user: root
