@@ -48,6 +48,8 @@
   vars:
     ansible_ssh_pass: '{{ password | default(omit) }}'
     host_key_checking: '{{ host_key_checking | default(False) }}'
+    system_install_ssh_chroot_pid: /run/ssh-chroot.pid
+
     ## Use a pre-generated installation
     #
     # If defined, download a tarball of a system install instead of using
@@ -59,6 +61,26 @@
     #
     # system_install_base: []
 
+  pre_tasks:
+    - block:
+
+        # Killing sshd does not remove existing active connections.
+        - name: Stop ssh connections in chroot (may safely fail)
+          shell:
+            pkill -P $(cat '{{ system_install_ssh_chroot_pid }}')
+
+        - name: Stop ssh server in chroot (may safely fail)
+          command:
+            pkill -F '{{ system_install_ssh_chroot_pid }}'
+
+      ignore_errors: yes
+      # For some reason this check is not working
+      # when: system_install_ssh_chroot_pid is file
+
+  roles:
+    # Install the machine. See system-install role for more customization.
+    - { role: system-install, tags: system-install }
+
   post_tasks:
     # Variables are not available between diffrent plays but those stored
     # using set_fact. Some of them are required later.
@@ -67,6 +89,7 @@
         system_install_target: '{{ system_install_target }}'
         system_install_partitions: '{{ system_install_partitions }}'
         system_install_pseudo_fs: '{{ system_install_pseudo_fs }}'
+        system_install_ssh_chroot_pid: '{{ system_install_ssh_chroot_pid }}'
 
     # SSH server keys are not created by default on Centos
     - name: create ssh server keys (Centos like)
@@ -87,11 +110,7 @@
     - name: start ssh server in chroot
       command: |-
         chroot '{{ system_install_target }}' /usr/sbin/sshd -p 2222 \
-        -o PidFile=/run/ssh-chroot.pid
-        
-  roles:
-    # Install the machine. See system-install role for more customization.
-    - { role: system-install, tags: system-install }
+        -o PidFile='{{ system_install_ssh_chroot_pid }}'
 
 ## Second stage
 #
@@ -177,12 +196,12 @@
     # stopping the ssh server otherwise /dev would not be able to unmounted.
     - name: Stop ssh connections in chroot
       shell:
-        pkill -P $(cat /run/ssh-chroot.pid)
+        pkill -P $(cat '{{ system_install_ssh_chroot_pid }}')
 
     # Now kill the chrooted ssh server
     - name: Stop ssh server in chroot
       command:
-        pkill -F /run/ssh-chroot.pid
+        pkill -F '{{ system_install_ssh_chroot_pid }}'
         
     - name: umount pseudo file systems from the chroot target
       mount:
