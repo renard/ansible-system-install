@@ -1,0 +1,23 @@
+## Basic grub setup.
+#
+- name: Configure grub
+  lineinfile:
+    dest: '{{ system_install_target }}/etc/default/grub'
+    regexp: '{{ item.r }}'
+    line: '{{ item.l }}'
+    backrefs: yes
+    create: yes
+  with_items:
+    - { r: '^.*(GRUB_HIDDEN_TIMEOUT\s*=.*)', l: '# \1' }
+    - { r: '^.*(GRUB_TERMINAL).*', l: '\1=console' }
+    - { r: '^.*(GRUB_CMDLINE_LINUX_DEFAULT).*' , l: '\1="{{ system_install_grub_linux_default | join(" ") }}"' }
+    - { r: '^.*(GRUB_TIMEOUT).*=.*', l: '\1=5' }
+    - { r: '^(.*(GRUB_RECORDFAIL_TIMEOUT).*=.*)|$', l: 'GRUB_RECORDFAIL_TIMEOUT=5' }
+  
+- name: update grub (Debian like)
+  command:
+    chroot '{{ system_install_target }}' update-grub
+
+- name: Install grub (Debian like)
+  command:
+    chroot '{{ system_install_target }}' grub-install '{{ system_install_drive }}'

@@ -1,0 +1,33 @@
+
+- name: install grub
+  command:
+    chroot '{{ system_install_target }}' grub-install '{{ system_install_drive }}'
+    
+## TODO: Find a way to figureout installed kernel
+- name: update initfs
+  shell:
+    chroot '{{ system_install_target }}' mkinitfs $(ls '{{ system_install_target }}'/lib/modules/)
+         
+- name: update grub configuration
+  command:
+    chroot '{{ system_install_target }}' grub-mkconfig -o /boot/grub/grub.cfg
+
+
+## TODO: Move to post-install
+- name: auto start networking
+  command:
+    chroot '{{ system_install_target }}' rc-update add networking default
+
+- name: auto start modules
+  command:
+    chroot '{{ system_install_target }}' rc-update add modules boot
+
+- name: auto start sshd
+  command:
+    chroot '{{ system_install_target }}' rc-update add sshd default
+
+# Fix this
+- name: modules to be loaded at boot time
+  shell:
+    echo "vmxnet3" > '{{ system_install_target }}/etc/modules-load.d/alpine.conf'
+
