@@ -6,7 +6,7 @@
   when:
     system_install_base is not defined
       or system_install_base == omit
-      or system_install_base == '')
+      or system_install_base == ''
 
 - include: base.yml
   when:
