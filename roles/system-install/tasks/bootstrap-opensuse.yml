@@ -46,7 +46,7 @@
     zypper --no-gpg-checks \
     --non-interactive \
     --root '{{ system_install_target }}' \
-    install {{ system_install_opensuse_packages | join(" ") }}
+    install {{ _system_install_packages | join(" ") }}
   args:
     creates: '{{ system_install_target }}/root'
     warn: false

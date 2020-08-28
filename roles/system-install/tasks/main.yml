@@ -2,7 +2,7 @@
 
 - include: harddrive.yml
 
-- include: bootstrap-centos.yml
+- include: bootstrap.yml
   when:
     system_install_base is not defined
       or system_install_base == omit

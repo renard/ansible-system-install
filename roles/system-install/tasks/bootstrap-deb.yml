@@ -19,7 +19,6 @@
     _system_install_apt_mirror: '{{ system_install_debian_apt_mirror }}'
     _system_install_apt_release: '{{ system_install_debian_apt_release }}'
     _system_install_apt_components: '{{ system_install_debian_apt_components }}'
-    _system_install_kernel_packages: '{{ system_install_debian_kernel_packages }}'
   when: system_install_vendor == 'debian'
     
 - name: Process generic variables (ubuntu)
@@ -27,7 +26,6 @@
     _system_install_apt_mirror: '{{ system_install_ubuntu_apt_mirror }}'
     _system_install_apt_release: '{{ system_install_ubuntu_apt_release }}'
     _system_install_apt_components: '{{ system_install_ubuntu_apt_components }}'
-    _system_install_kernel_packages: '{{ system_install_ubuntu_kernel_packages }}'
   when: system_install_vendor == 'ubuntu'
 
 
@@ -36,7 +34,7 @@
     debootstrap \
     --arch '{{ system_install_arch }}' \
     --components '{{ _system_install_apt_components | join(",") }}' \
-    --include='{{ (system_install_additional_packages + _system_install_kernel_packages) | join(",") }}'
+    --include='{{ _system_install_packages | join(",") }}'
     '{{ _system_install_apt_release }}' '{{ system_install_target }}' \
     '{{ _system_install_apt_mirror }}'
   args:

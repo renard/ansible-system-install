@@ -32,7 +32,7 @@
     --enablerepo=bootstrap-* \
     --disableplugin=* \
     --installroot='{{ system_install_target }}' \
-    install {{ system_install_centos_packages | join(" ") }}
+    install {{ _system_install_packages | join(" ") }}
   args:
     creates: '{{ system_install_target }}/etc'
     warn: false

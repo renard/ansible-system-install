@@ -1,0 +1,103 @@
+system_install_packages:
+  ## kernel packages
+  - pkg: ipxe
+    os: [ 'debian' ]
+  - pkg: firmware-linux-free
+    os: [ 'debian' ]
+  - pkg: firmware-linux-nonfree
+    os: [ 'debian' ]
+  - pkg: firmware-bnx2
+    os: [ 'debian' ]
+  - pkg: firmware-bnx2x
+    os: [ 'debian' ]
+  - pkg: linux-image-amd64
+    os: [ 'debian' ]
+  - pkg: linux-image-generic
+    os: [ 'ubuntu' ]
+  - pkg: grub-ipxe
+    os: [ 'ubuntu' ]
+  # Needed to create initrd.img
+  - pkg: initramfs-tools
+    os: [ 'debian', 'ubuntu' ]
+  ## End of kernel packages
+  
+  # Needed for name resolution in chroot
+  - pkg: resolvconf
+    os: [ 'debian', 'ubuntu' ]
+  # Needed to create /etc/network directory
+  - pkg: ifupdown
+    os: [ 'debian', 'ubuntu' ]
+  #
+  - pkg: xfsprogs
+    os: [ 'debian', 'ubuntu' ]
+  - pkg: lvm2
+    os: [ 'debian', 'ubuntu' ]
+  - pkg: openssh-server
+    os: [ 'debian', 'ubuntu' ]
+  - pkg: grub-pc
+    os: [ 'debian', 'ubuntu' ]
+  # - pkg: python
+  #  os: [ 'debian', 'ubuntu' ]
+  - pkg: python3-apt
+    os: [ 'debian', 'ubuntu' ]
+  - pkg: cryptsetup
+    os: [ 'debian', 'ubuntu' ]
+  - pkg: busybox
+    os: [ 'debian', 'ubuntu' ]
+  - pkg: dropbear
+    os: [ 'debian', 'ubuntu' ]
+  - pkg: lsb-release
+    os: [ 'debian', 'ubuntu' ]
+  - pkg: mdadm
+    os: [ 'debian', 'ubuntu' ]
+  - pkg: isc-dhcp-client
+    os: [ 'debian', 'ubuntu' ]
+
+  ### Centos
+  - pkg: bash
+    os: [ 'centos', 'opensuse' ]
+  - pkg: yum
+    os: [ 'centos', 'opensuse' ]
+  - pkg: yum-utils
+    os: [ 'centos', 'opensuse' ]
+  - pkg: zypper
+    os: [ 'opensuse' ]
+  - pkg: rpm
+    os: [ 'opensuse' ]
+  - pkg: wget
+    os: [ 'opensuse' ]
+  - pkg: rootfiles
+    os: [ 'centos' ]
+  - pkg: sudo
+    os: [ 'centos', 'opensuse' ]
+  - pkg: kernel
+    os: [ 'centos', 'opensuse' ]
+  - pkg: xfsprogs
+    os: [ 'centos', 'opensuse' ]
+  - pkg: grub2-pc
+    os: [ 'centos' ]
+  - pkg: grub2-i386-pc
+    os: [ 'opensuse' ]
+  - pkg: dhcp-client
+    os: [ 'centos', 'opensuse' ]
+  - pkg: network-scripts
+    os: [ 'centos' ]
+  - pkg: openssh-server
+    os: [ 'centos' ]
+  - pkg: openssh-clients
+    os: [ 'centos' ]
+  - pkg: 'openssh'
+    os: [ 'opensuse' ]
+  - pkg: NetworkManager
+    os: [ 'centos' ]
+  # https://unix.stackexchange.com/questions/442698/when-i-log-in-it-hangs-until-crng-init-done
+  - pkg: rng-tools
+    os: [ 'centos' ]
+  # Python for ansible
+  - pkg: python38
+    os: [ 'centos' ]
+  # Centos 7
+  - pkg: python3
+    os: [ 'centos', 'opensuse' ]
+  - pkg: python3-libselinux
+    os: [ 'centos' ]
