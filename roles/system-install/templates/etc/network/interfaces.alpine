@@ -1,0 +1,6 @@
+auto lo
+iface lo inet loopback
+
+auto {{ system_install_network_iface }}
+iface {{ system_install_network_iface }} inet dhcp
+      hostname localhost

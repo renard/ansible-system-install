@@ -1,24 +1,25 @@
 ---
 
-## Basic grub setup.
-#
-- name: Configure grub
-  lineinfile:
-    dest: '{{ system_install_target }}/etc/default/grub'
-    regexp: '{{ item.r }}'
-    line: '{{ item.l }}'
-    backrefs: yes
-    create: yes
-  with_items:
-    - { r: '^.*(GRUB_HIDDEN_TIMEOUT\s*=.*)', l: '# \1' }
-    - { r: '^.*(GRUB_TERMINAL).*', l: '\1=console' }
-    - { r: '^.*(GRUB_CMDLINE_LINUX_DEFAULT).*' , l: '\1="{{ system_install_grub_linux_default | join(" ") }}"' }
-    - { r: '^.*(GRUB_TIMEOUT).*=.*', l: '\1=5' }
-    - { r: '^(.*(GRUB_RECORDFAIL_TIMEOUT).*=.*)|$', l: 'GRUB_RECORDFAIL_TIMEOUT=5' }
 
 - name: Install grub (Debian like)
   block:
 
+    ## Basic grub setup.
+    #
+    - name: Configure grub
+      lineinfile:
+        dest: '{{ system_install_target }}/etc/default/grub'
+        regexp: '{{ item.r }}'
+        line: '{{ item.l }}'
+        backrefs: yes
+        create: yes
+      with_items:
+        - { r: '^.*(GRUB_HIDDEN_TIMEOUT\s*=.*)', l: '# \1' }
+        - { r: '^.*(GRUB_TERMINAL).*', l: '\1=console' }
+        - { r: '^.*(GRUB_CMDLINE_LINUX_DEFAULT).*' , l: '\1="{{ system_install_grub_linux_default | join(" ") }}"' }
+        - { r: '^.*(GRUB_TIMEOUT).*=.*', l: '\1=5' }
+        - { r: '^(.*(GRUB_RECORDFAIL_TIMEOUT).*=.*)|$', l: 'GRUB_RECORDFAIL_TIMEOUT=5' }
+    
     - name: update grub (Debian like)
       command:
         chroot '{{ system_install_target }}' update-grub
@@ -51,4 +52,40 @@
         chroot '{{ system_install_target }}' grub2-install '{{ system_install_drive }}'
 
   when: system_install_vendor in [ 'centos', 'opensuse' ]
+
+
+- name: Install grub (Alpine like)
+  block:
+    - name: install grub
+      command:
+        chroot '{{ system_install_target }}' grub-install '{{ system_install_drive }}'
+    
+    ## TODO: Find a way to figureout installed kernel
+    - name: update initfs
+      shell:
+        chroot '{{ system_install_target }}' mkinitfs $(ls '{{ system_install_target }}'/lib/modules/)
+         
+    - name: update grub configuration
+      command:
+        chroot '{{ system_install_target }}' grub-mkconfig -o /boot/grub/grub.cfg
+
+    - name: auto start networking
+      command:
+        chroot '{{ system_install_target }}' rc-update add networking default
+
+    - name: auto start modules
+      command:
+        chroot '{{ system_install_target }}' rc-update add modules boot
+
+    - name: auto start sshd
+      command:
+        chroot '{{ system_install_target }}' rc-update add sshd default
+
+    # Fix this
+    - name: modules to be loaded at boot time
+      shell:
+        echo "vmxnet3" > '{{ system_install_target }}/etc/modules-load.d/alpine.conf'
+
+    
+  when: system_install_vendor in [ 'alpine' ]
 

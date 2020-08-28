@@ -3,7 +3,7 @@
 # Copyright © 2020 Sébastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 
 # Created: 2020-02-20
-# Last changed: 2020-08-28 16:02:25
+# Last changed: 2020-08-28 17:14:04
 
 # This program is free software. It comes without any warranty, to
 # the extent permitted by applicable law. You can redistribute it
@@ -92,13 +92,15 @@
         system_install_ssh_chroot_pid: '{{ system_install_ssh_chroot_pid }}'
 
     # SSH server keys are not created by default on Centos
+    #
+    # TODO: check if there is not an easier way to configue sshd keys.
     - name: create ssh server keys (Centos like)
       command: |-
         chroot '{{ system_install_target }}' ssh-keygen \
         -f '/etc/ssh/ssh_host_{{ item }}_key' -N '' -t '{{ item }}'
       args:
         creates: '{{ system_install_target }}/etc/ssh/ssh_host_{{ item }}_key'
-      when: system_install_vendor in [ 'centos', 'opensuse' ]
+      when: system_install_vendor in [ 'centos', 'opensuse', 'alpine' ]
       with_items:
         - rsa
         - ecdsa

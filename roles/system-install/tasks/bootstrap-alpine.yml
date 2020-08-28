@@ -1,0 +1,40 @@
+
+# See documentation here:
+# https://wiki.alpinelinux.org/wiki/Bootstrapping_Alpine_Linux
+  
+- block:
+    - name: get apk tool
+      unarchive:
+        src: '{{ system_install_alpine_apk_static_url }}'
+        remote_src: yes
+        dest: /tmp
+        creates: /tmp/sbin/apk.static
+  rescue:
+    - fail:
+        msg: |-
+          Cannot download apk-tools-static binary version '{{ system_install_alpine_apk_static_version }}'.
+          Check in available version of apk-tools-static in '{{ system_install_alpine_apk_repo }}/main/{{ system_install_alpine_arch }}/' and configure system_install_alpine_apk_static_version.
+          You can use: "curl -s {{ system_install_alpine_apk_repo }}/main/{{ system_install_alpine_arch }}/ | grep apk-tools-static".
+
+
+- name: bootstrap alpine
+  command: >-
+    /tmp/sbin/apk.static --arch '{{ system_install_alpine_arch }}'
+    -X '{{ system_install_alpine_apk_repo }}/main' -U --allow-untrusted
+    --root '{{ system_install_target }}'
+    --initdb add {{ system_install_alpine_bootstrap_packages | join(" ") }}
+  args:
+    creates: '{{ system_install_target }}/etc/alpine-release'
+
+
+
+- name: Create required configuration files
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ system_install_target }}/{{ item.dest | default(item.src) }}'
+  with_items:
+    - src: etc/apk/repositories
+    - src: etc/default/grub
+    - src: etc/network/interfaces.alpine
+      dest: etc/network/interfaces
+    - src: etc/mkinitfs/mkinitfs.conf

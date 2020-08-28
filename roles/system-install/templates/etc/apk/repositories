@@ -1,0 +1,3 @@
+{% for b in system_install_alpine_apk_branches %}
+{{ system_install_alpine_apk_repo }}/{{ b }}
+{% endfor %}
