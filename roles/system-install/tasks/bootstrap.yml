@@ -18,7 +18,7 @@
 - include: bootstrap-opensuse.yml
   when: system_install_vendor in ['opensuse']
     
-- include: bootstrap-deb.yml
+- include: bootstrap-debian.yml
   when: system_install_vendor in [ 'debian', 'ubuntu' ]
 
 - include: bootstrap-alpine.yml
