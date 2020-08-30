@@ -1,0 +1,15 @@
+---
+
+- name: Copy grub configuration (Fedora)
+  copy:
+    src: etc/default/grub
+    dest: '{{ system_install_target }}/etc/default/grub'
+    mode: '0644'
+      
+- name: update grub (Fedora)
+  command:
+    chroot '{{ system_install_target }}' grub2-mkconfig -o /boot/grub2/grub.cfg
+
+- name: Install grub (Fedora)
+  command:
+    chroot '{{ system_install_target }}' grub2-install '{{ system_install_drive }}'
