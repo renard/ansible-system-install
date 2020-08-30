@@ -1,0 +1,64 @@
+  
+## centos version and architechtures
+system_install_centos_version: 7
+system_install_centos_arch: x86_64
+
+## Mirror to use
+system_install_centos_mirror: 'http://mirror.centos.org'
+
+
+## Base URLs for the repo file.
+#
+# name: is the repository name used by yum. It will be prefixed by
+#       "bootstrap-" to easilly enable it with yum command.
+# baseurl: the repository base URL.
+# versions: versions to which this repository applies.
+#
+system_install_centos_repositories:
+  # Base system
+  - name: BaseOS
+    baseurl: '{{ system_install_centos_mirror }}/centos/{{ system_install_centos_version }}/BaseOS/{{ system_install_centos_arch }}/os/'
+    versions:
+      - 8
+  # Python
+  - name: AppStream
+    baseurl: '{{ system_install_centos_mirror }}/centos/{{ system_install_centos_version }}/AppStream/{{ system_install_centos_arch }}/os/'
+    versions:
+      - 8
+
+  # Base system
+  - name: os
+    baseurl: '{{ system_install_centos_mirror }}/centos/{{ system_install_centos_version }}/os/{{ system_install_centos_arch }}'
+    versions:
+      - 7
+
+system_install_centos_gpg_keys_urls:
+  - https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official
+  - https://www.centos.org/keys/RPM-GPG-KEY-CentOS-7
+
+
+system_install_centos_packages:
+  ### Centos
+  - pkg: bash
+  - pkg: yum
+  - pkg: yum-utils
+  - pkg: rootfiles
+  - pkg: sudo
+  - pkg: kernel
+  - pkg: xfsprogs
+  - pkg: grub2-pc
+  - pkg: dhcp-client
+  - pkg: network-scripts
+  - pkg: openssh-server
+  - pkg: openssh-clients
+  - pkg: NetworkManager
+  # https://unix.stackexchange.com/questions/442698/when-i-log-in-it-hangs-until-crng-init-done
+  - pkg: rng-tools
+  # Python for ansible
+  - pkg: python38
+  # Centos 7
+  - pkg: python3
+  - pkg: python3-libselinux
+  - pkg: dnf
+
+

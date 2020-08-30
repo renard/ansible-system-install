@@ -1,0 +1,57 @@
+# Setup for Ubuntu
+system_install_ubuntu_apt_mirror: 'http://fr.archive.ubuntu.com/ubuntu/'
+system_install_ubuntu_apt_release: eoan
+system_install_ubuntu_apt_components:
+  - main
+  - restricted
+  - universe
+  - multiverse
+
+# Setup for Debian
+system_install_debian_apt_mirror: 'http://deb.debian.org/debian'
+system_install_debian_apt_release: buster
+system_install_debian_apt_components:
+  - main
+  - contrib
+  - non-free
+
+
+system_install_debian_packages:
+  ## kernel packages
+  - pkg: ipxe
+    os: [ 'debian' ]
+  - pkg: firmware-linux-free
+    os: [ 'debian' ]
+  - pkg: firmware-linux-nonfree
+    os: [ 'debian' ]
+  - pkg: firmware-bnx2
+    os: [ 'debian' ]
+  - pkg: firmware-bnx2x
+    os: [ 'debian' ]
+  - pkg: linux-image-amd64
+    os: [ 'debian' ]
+  - pkg: linux-image-generic
+    os: [ 'ubuntu' ]
+  - pkg: grub-ipxe
+    os: [ 'ubuntu' ]
+  # Needed to create initrd.img
+  - pkg: initramfs-tools
+  ## End of kernel packages
+  
+  # Needed for name resolution in chroot
+  - pkg: resolvconf
+  # Needed to create /etc/network directory
+  - pkg: ifupdown
+  #
+  - pkg: xfsprogs
+  - pkg: lvm2
+  - pkg: openssh-server
+  - pkg: grub-pc
+  # - pkg: python
+  - pkg: python3-apt
+  - pkg: cryptsetup
+  - pkg: busybox
+  - pkg: dropbear
+  - pkg: lsb-release
+  - pkg: mdadm
+  - pkg: isc-dhcp-client

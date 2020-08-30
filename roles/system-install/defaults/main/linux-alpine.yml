@@ -8,17 +8,32 @@ system_install_alpine_apk_branches:
   - main
   - community
 
+system_install_alpine_apk_static_versions:
+  v3.9: 2.10.3-r1
+  v3.10: 2.10.4-r2
+  v3.11: 2.10.5-r0
+  v3.12: 2.10.5-r1
+  latest-stable: 2.10.5-r1
+  
 # See http://nl.alpinelinux.org/alpine/latest-stable/main/x86_64/
-system_install_alpine_apk_static_version: '2.10.5-r1'
+system_install_alpine_apk_static_version: '{{ system_install_alpine_apk_static_versions[system_install_alpine_version] }}'
 system_install_alpine_apk_static_url: '{{ system_install_alpine_apk_repo }}/main/{{ system_install_alpine_arch }}/apk-tools-static-{{ system_install_alpine_apk_static_version }}.apk'
 
-system_install_alpine_bootstrap_packages:
-  - alpine-base
-  - iproute2
-  - openssh
-  - linux-lts
-  - xfsprogs-extra
-  - grub
-  - grub-bios
-  - dhclient
-  - sudo
+system_install_alpine_packages:
+  - pkg: alpine-base
+  - pkg: iproute2
+  - pkg: openssh
+  - pkg: linux-vanilla
+    version:
+      - v3.9
+      - v3.10
+  - pkg: linux-lts
+    version:
+      - v3.11
+      - v3.12
+      - latest-stable
+  - pkg: xfsprogs-extra
+  - pkg: grub
+  - pkg: grub-bios
+  - pkg: dhclient
+  - pkg: sudo

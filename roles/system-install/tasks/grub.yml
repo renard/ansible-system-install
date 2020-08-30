@@ -6,6 +6,9 @@
 - include_tasks: grub-centos.yml    
   when: system_install_vendor == 'centos'
 
+- include_tasks: grub-fedora.yml
+  when: system_install_vendor == 'fedora'
+
 - include_tasks: grub-opensuse.yml    
   when: system_install_vendor == 'opensuse'
 

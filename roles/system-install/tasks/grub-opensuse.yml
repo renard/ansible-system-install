@@ -15,7 +15,6 @@
     - { r: '^.*(GRUB_TIMEOUT).*=.*', l: '\1=5' }
     - { r: '^(.*(GRUB_RECORDFAIL_TIMEOUT).*=.*)|$', l: 'GRUB_RECORDFAIL_TIMEOUT=5' }
 
-
 - name: Generate initrd (OpenSUSE)
   command:
     chroot '{{ system_install_target }}' mkinitrd

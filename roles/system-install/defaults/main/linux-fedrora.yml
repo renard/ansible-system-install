@@ -1,0 +1,40 @@
+
+system_install_fedora_version: 32
+system_install_fedora_arch: x86_64
+system_install_fedora__mirror: 'http://download.fedoraproject.org/pub'
+system_install_fedora_gpg_keys_urls:
+  - https://getfedora.org/static/fedora.gpg
+    
+system_install_fedora_repositories:
+  # Base system
+  - name: BaseOS
+    baseurl: '{{ system_install_fedora__mirror }}/fedora/linux/releases/{{ system_install_fedora_version }}/Everything/{{ system_install_fedora_arch }}/os/'
+    versions:
+      - 8
+
+
+system_install_fedora_packages:
+  ### Centos
+  - pkg: bash
+  - pkg: yum
+  - pkg: yum-utils
+  - pkg: rootfiles
+  - pkg: sudo
+  - pkg: kernel
+  - pkg: xfsprogs
+  - pkg: grub2-pc
+  - pkg: dhcp-client
+  - pkg: network-scripts
+  - pkg: openssh-server
+  - pkg: openssh-clients
+  - pkg: NetworkManager
+  # https://unix.stackexchange.com/questions/442698/when-i-log-in-it-hangs-until-crng-init-done
+  - pkg: rng-tools
+  # Python for ansible
+  - pkg: python38
+  # Centos 7
+  - pkg: python3
+  - pkg: python3-libselinux
+  - pkg: dnf
+
+

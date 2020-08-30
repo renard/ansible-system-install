@@ -1,4 +1,17 @@
 
+- name: generate packages list
+  set_fact:
+    _system_install_packages: '{{
+    (system_install_debian_packages + system_install_extra_debian_packages | default([]))
+    | json_query("[?state!=''absent''
+    && (
+    !contains(keys(@),''os'')
+    || contains(os, ''" + system_install_vendor + "'')
+    )
+    ].pkg") | list
+    }}'
+
+  
 - name: install required packages
   apt:
     pkg:

@@ -1,10 +1,9 @@
 ---
 
-
 - name: generate packages list
   set_fact:
     _system_install_packages: '{{
-    (system_install_opensuse_packages + system_install_extra_opensuse_packages | default([]))
+    (system_install_fedora_packages + system_install_extra_fedora_packages | default([]))
     | json_query("[?state!=''absent''
     && (
     !contains(keys(@),''os'')
@@ -13,28 +12,25 @@
     ].pkg") | list
     }}'
 
-
 # On debian
 - name: Install required packages (debian)
   apt:
-    pkg: zypper
+    pkg: yum-utils
     install-recommends: no
     update_cache: yes
     cache_valid_time: 3600
 
-# Zypper repository does not support a specific file destination so it
-# cannot be added in the chroot target using zypper_repository.
-- name: deploy zypper source file
-  command: |-
-    zypper \
-    --root '{{ system_install_target }}' \
-    addrepo '{{ item.repo }}' \
-    'bootstrap-{{ item.name }}'
-  args:
-    creates: '{{ system_install_target }}/etc/zypp/repos.d/bootstrap-{{ item.name }}.repo'
-    warn: false
-  with_items: '{{ system_install_opensuse_repositories }}'
-    
+- name: deploy yum source file
+  yum_repository:
+    name: 'bootstrap-{{ item.name }}'
+    description: bootsrap fedora
+    baseurl: '{{ item.baseurl }}'
+    reposdir: /tmp
+    file: /tmp/bootstrap
+    gpgcheck: 0
+    gpgkey: '{{ item.gpgkey | default(system_install_fedora_gpg_keys_urls) }}'
+  # when: system_install_fedora_version in item.versions
+  with_items: '{{ system_install_fedora_repositories }}'
     
 # yum command cannot be run on Debian system:
 # pkg_mgr: apt
@@ -43,12 +39,15 @@
 # yum should be manually run to bootstrap CentOS
 - name: install base system
   command: |-
-    zypper --no-gpg-checks \
-    --non-interactive \
-    --root '{{ system_install_target }}' \
+    yum -y -c /tmp/bootstrap.repo \
+    --nogpgcheck \
+    --disablerepo=* \
+    --enablerepo=bootstrap-* \
+    --disableplugin=* \
+    --installroot='{{ system_install_target }}' \
     install {{ _system_install_packages | join(" ") }}
   args:
-    creates: '{{ system_install_target }}/root'
+    creates: '{{ system_install_target }}/etc'
     warn: false
 
 # - name: Configure yum vars
@@ -57,6 +56,7 @@
 #     content: '{{ item.content }}'
 #   with_items:
 #     - dest: /etc/yum/vars/releasever
-#       content: '{{ system_install_opensuse_version }}'
+#       content: '{{ system_install_fedora_version }}'
 #     - dest: /etc/yum/vars/basearch
-#       content: '{{ system_install_opensuse_arch }}'
+#       content: '{{ system_install_fedora_arch }}'
+

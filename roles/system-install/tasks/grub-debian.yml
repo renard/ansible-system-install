@@ -1,3 +1,5 @@
+---
+
 ## Basic grub setup.
 #
 - name: Configure grub
@@ -13,11 +15,44 @@
     - { r: '^.*(GRUB_CMDLINE_LINUX_DEFAULT).*' , l: '\1="{{ system_install_grub_linux_default | join(" ") }}"' }
     - { r: '^.*(GRUB_TIMEOUT).*=.*', l: '\1=5' }
     - { r: '^(.*(GRUB_RECORDFAIL_TIMEOUT).*=.*)|$', l: 'GRUB_RECORDFAIL_TIMEOUT=5' }
-  
+    - { r: '^.*(GRUB_TIMEOUT_STYLE.*=.*)', l: '# \1' }
+
+# /usr/sbin/grub-mkconfig fails if / is a ramdisk with error:
+# error: failed to get canonical path of `none'.
+#
+# We divert grub-probe to never fail. This prevent from modifing the
+# /usr/sbin/grub-mkconfig script by removing its 'set -e' option.
+#
+# Please note that this hack is specific when / is a tmpfs or a squashfs.
+#
+# Got that issue at least until grub-common 2.02~beta2-9
+- block:
+    
+  - name: diverting grub-probe
+    command: |-
+      chroot '{{ system_install_target }}' /usr/bin/dpkg-divert
+        --add --rename /usr/sbin/grub-probe
+    args:
+      creates: '{{ system_install_target }}/usr/sbin/grub-probe.distrib'
+
+  - name: Copy a failsafe version of grub-probe
+    copy:
+      src: usr/sbin/grub-probe
+      dest: '{{ system_install_target }}/usr/sbin/grub-probe'
+      owner: root
+      group: root
+      mode: '0755'
+
+  # when:
+  #   ((system_install_vendor == 'ubuntu') && (system_install_ubuntu_apt_release in ['xenial']))
+  #   ||
+  #   ((system_install_vendor == 'debian') && (system_install_debian_apt_release in ['jessie']))
+          
+
 - name: update grub (Debian like)
   command:
     chroot '{{ system_install_target }}' update-grub
 
-- name: Install grub (Debian like)
+- name: Install grub (Debian like) (
   command:
     chroot '{{ system_install_target }}' grub-install '{{ system_install_drive }}'

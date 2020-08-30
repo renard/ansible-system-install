@@ -1,7 +1,21 @@
 
 # See documentation here:
 # https://wiki.alpinelinux.org/wiki/Bootstrapping_Alpine_Linux
-  
+
+
+- name: generate packages list (alpine)
+  set_fact:
+    _system_install_packages: '{{
+    (system_install_alpine_packages + system_install_extra_alpine_packages | default([]))
+    | json_query("[?state!=''absent''
+    && (
+    !contains(keys(@),''version'')
+    || contains(version, ''" + system_install_alpine_version + "'')
+    )
+    ].pkg") | list
+    }}'
+
+
 - block:
     - name: get apk tool
       unarchive:
@@ -22,7 +36,7 @@
     /tmp/sbin/apk.static --arch '{{ system_install_alpine_arch }}'
     -X '{{ system_install_alpine_apk_repo }}/main' -U --allow-untrusted
     --root '{{ system_install_target }}'
-    --initdb add {{ system_install_alpine_bootstrap_packages | join(" ") }}
+    --initdb add {{ _system_install_packages | join(" ") }}
   args:
     creates: '{{ system_install_target }}/etc/alpine-release'
 
