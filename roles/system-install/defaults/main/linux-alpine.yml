@@ -37,3 +37,4 @@ system_install_alpine_packages:
   - pkg: grub-bios
   - pkg: dhclient
   - pkg: sudo
+  - pkg: tar
