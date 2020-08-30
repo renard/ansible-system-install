@@ -3,7 +3,7 @@
 # Copyright © 2020 Sébastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 
 # Created: 2020-02-20
-# Last changed: 2020-08-28 17:14:04
+# Last changed: 2020-08-30 02:23:58
 
 # This program is free software. It comes without any warranty, to
 # the extent permitted by applicable law. You can redistribute it
@@ -100,7 +100,7 @@
         -f '/etc/ssh/ssh_host_{{ item }}_key' -N '' -t '{{ item }}'
       args:
         creates: '{{ system_install_target }}/etc/ssh/ssh_host_{{ item }}_key'
-      when: system_install_vendor in [ 'centos', 'opensuse', 'alpine' ]
+      when: system_install_vendor in [ 'centos', 'opensuse', 'fedora','alpine' ]
       with_items:
         - rsa
         - ecdsa
@@ -142,14 +142,14 @@
     #
     ansible_python_interpreter: '{{ chroot_python_interpreter | default("/usr/bin/python3") }}'
 
-  # Configure roles that suit your need here. 
-  roles:
-    # - { role: apt, tags: apt }
-    # - { role: etckeeper, tags: etckeeper }
-    #- { role: system-install-fix, tags: system-install-fix }
-    - { role: base, tags: base }
-    # - { role: credentials, tags: credentials }
-    # - { role: isc-dhcp-client, tags: isc-dhcp-client }
+  # # Configure roles that suit your need here. 
+  # roles:
+  #   # - { role: apt, tags: apt }
+  #   # - { role: etckeeper, tags: etckeeper }
+  #   #- { role: system-install-fix, tags: system-install-fix }
+  #   - { role: base, tags: base }
+  #   # - { role: credentials, tags: credentials }
+  #   # - { role: isc-dhcp-client, tags: isc-dhcp-client }
 
   post_tasks:
 
@@ -165,15 +165,19 @@
     # ssh. For now we don't need it to be enabled.
     #
     # If SELinux should be enabled, use an other role for that.
+    #
+    # Need a little cleanup
     - block:
         - name: Disable SELinux
           lineinfile:
             dest: '/etc/selinux/config'
             line: 'SELINUX=disabled'
             regexp: '^\s*SELINUX\s*=.*'
+            create: yes
+            insertafter: EOF
       when:
-        system_install_vendor in [ 'centos' ]
-        and '/etc/selinux/config' is exists
+        system_install_vendor in [ 'centos', 'fedora' ]
+        #        and '/etc/selinux/config' is exists
     
 
 ## Third stage
