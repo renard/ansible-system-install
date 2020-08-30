@@ -1,0 +1,17 @@
+#!/bin/sh
+
+cat << EOF >&2
+WARNING: using a failsafe version of $0
+
+If your root filesystem (/) is a tmpfs or squashfs you can ignore this
+message. Otherwise check your grub installation.
+
+To disable this failsafe version run:
+
+  mv $0.distrib $0.failsafe
+  dpkg-divert --force --remove --rename $0
+EOF
+
+/usr/sbin/grub-probe.distrib "$@" || true
+
+exit 0
