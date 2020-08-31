@@ -1,0 +1,9 @@
+
+# Configure DHCP on the primary network interface.
+- name: Deploy network interface file (Debian like)
+  template:
+    src: etc/network/interfaces
+    dest: '{{ system_install_target }}/etc/network/interfaces'
+    owner: root
+    group: root
+    mode: '0644'

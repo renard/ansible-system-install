@@ -12,56 +12,27 @@
     and item.filesystem is defined
   with_items: '{{ system_install_partitions }}'
 
-# Configure DHCP on the primary network interface.
-- name: Deploy network interface file (Debian like)
-  template:
-    src: etc/network/interfaces
-    dest: '{{ system_install_target }}/etc/network/interfaces'
-    owner: root
-    group: root
-    mode: '0644'
+- include_tasks: post-install-fix-debian.yml
   when: system_install_vendor in [ 'debian', 'ubuntu' ]
 
+- include_tasks: post-install-fix-centos.yml
+  when: system_install_vendor in [ 'centos', 'fedora' ]
 
-- name: Deploy network interface file (Centos like)
-  block:
-    
-    - name: Configure network (Centos like)
-      copy:
-        dest: '{{ system_install_target }}//etc/sysconfig/network-scripts/ifcfg-eth0'
-        content: |-
-          BOOTPROTO="dhcp"
-          ONBOOT="yes"
-      when: system_install_vendor in [ 'centos', 'fedora' ]
+- include_tasks: post-install-fix-opensuse.yml
+  when: system_install_vendor == 'opensuse'
 
-    - name: Configure network (OpenSUSE like)
-      copy:
-        dest: '{{ system_install_target }}//etc/sysconfig/network/ifcfg-eth0'
-        content: |-
-          BOOTPROTO='dhcp'
-          STARTMODE='auto'
-      when: system_install_vendor in [ 'opensuse' ]
-    
-    - name: Configure network (Centos like)
-      copy:
-        dest: '{{ system_install_target }}/etc/sysconfig/network'
-        content: |-
-            # Auto generated
-      when: system_install_vendor in [ 'centos', 'fedora' ]
+- include_tasks: post-install-fix-alpine.yml
+  when: system_install_vendor == 'alpine'
 
-    ## Dbus could not find its runtime directory.
-    #
-    # See
-    #  - https://bugzilla.redhat.com/show_bug.cgi?id=1568856
-    #  - https://unix.stackexchange.com/questions/523250/dbus-issues-unable-to-connect
-    - name: Fix NetworkManager link
-      command:
-        ln -s /run/dbus '{{ system_install_target }}/var/run/dbus'
-      args:
-        creates: '{{ system_install_target }}/var/run/dbus'
-        warn: false
-        
+## Dbus could not find its runtime directory.
+#
+# See
+#  - https://bugzilla.redhat.com/show_bug.cgi?id=1568856
+#  - https://unix.stackexchange.com/questions/523250/dbus-issues-unable-to-connect
+- name: Fix NetworkManager link
+  command:
+    ln -s /run/dbus '{{ system_install_target }}/var/run/dbus'
+  args:
+    creates: '{{ system_install_target }}/var/run/dbus'
+    warn: false
   when: system_install_vendor in [ 'centos', 'fedora', 'opensuse' ]
-
-  
-

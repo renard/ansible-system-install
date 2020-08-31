@@ -1,0 +1,10 @@
+- name: Create required configuration files
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ system_install_target }}/{{ item.dest | default(item.src) }}'
+  with_items:
+    - src: etc/apk/repositories
+    - src: etc/default/grub
+    - src: etc/network/interfaces.alpine
+      dest: etc/network/interfaces
+    - src: etc/mkinitfs/mkinitfs.conf

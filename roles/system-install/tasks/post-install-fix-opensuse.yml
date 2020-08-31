@@ -1,0 +1,14 @@
+- name: Configure network (OpenSUSE like)
+  copy:
+    dest: '{{ system_install_target }}//etc/sysconfig/network/ifcfg-eth0'
+    content: |-
+      BOOTPROTO='dhcp'
+      STARTMODE='auto'
+
+
+# In OpenSUSE sshd is not enabled by default at boot time.
+- name: Enable systemd sshd
+  command:
+    chroot '{{ system_install_target }}' /usr/bin/systemctl enable sshd
+  when: system_install_vendor in ['opensuse' ]
+

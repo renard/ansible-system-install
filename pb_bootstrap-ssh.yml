@@ -3,7 +3,7 @@
 # Copyright © 2020 Sébastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 
 # Created: 2020-02-20
-# Last changed: 2020-08-30 02:23:58
+# Last changed: 2020-08-31 11:38:07
 
 # This program is free software. It comes without any warranty, to
 # the extent permitted by applicable law. You can redistribute it
@@ -91,7 +91,7 @@
         system_install_pseudo_fs: '{{ system_install_pseudo_fs }}'
         system_install_ssh_chroot_pid: '{{ system_install_ssh_chroot_pid }}'
 
-    # SSH server keys are not created by default on Centos
+    # SSH server keys are not created by default on some distros.
     #
     # TODO: check if there is not an easier way to configue sshd keys.
     - name: create ssh server keys (Centos like)
@@ -100,13 +100,10 @@
         -f '/etc/ssh/ssh_host_{{ item }}_key' -N '' -t '{{ item }}'
       args:
         creates: '{{ system_install_target }}/etc/ssh/ssh_host_{{ item }}_key'
-      when: system_install_vendor in [ 'centos', 'opensuse', 'fedora','alpine' ]
       with_items:
         - rsa
         - ecdsa
         - ed25519
-        
-
         
     # Start ssh server in the chroot to allow the 2nd stage setup
     - name: start ssh server in chroot
@@ -142,6 +139,17 @@
     #
     ansible_python_interpreter: '{{ chroot_python_interpreter | default("/usr/bin/python3") }}'
 
+
+  tasks:
+    - name: setup
+      setup:
+      register: setup
+
+    - name: setup
+      debug:
+        msg: '{{ setup["ansible_facts"] }}'
+
+    
   # # Configure roles that suit your need here. 
   # roles:
   #   # - { role: apt, tags: apt }
@@ -150,34 +158,6 @@
   #   - { role: base, tags: base }
   #   # - { role: credentials, tags: credentials }
   #   # - { role: isc-dhcp-client, tags: isc-dhcp-client }
-
-  post_tasks:
-
-    ## TODO: move these tasks into system-install / fix.
-    
-    # In OpenSUSE sshd is not enabled by default at boot time.
-    - name: Enable systemd sshd
-      command:
-        /usr/bin/systemctl enable sshd
-      when: system_install_vendor in ['opensuse' ]
-    
-    # By default SELinux is enabled and prevent from login via
-    # ssh. For now we don't need it to be enabled.
-    #
-    # If SELinux should be enabled, use an other role for that.
-    #
-    # Need a little cleanup
-    - block:
-        - name: Disable SELinux
-          lineinfile:
-            dest: '/etc/selinux/config'
-            line: 'SELINUX=disabled'
-            regexp: '^\s*SELINUX\s*=.*'
-            create: yes
-            insertafter: EOF
-      when:
-        system_install_vendor in [ 'centos', 'fedora' ]
-        #        and '/etc/selinux/config' is exists
     
 
 ## Third stage
