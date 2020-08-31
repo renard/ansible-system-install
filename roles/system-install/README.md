@@ -108,75 +108,49 @@ more optimized images for PXE usage have a look at the `ramdisk` role.
 ## Tested versions
 
 
-| Version                | Status | EOL        | Restrictions      |
-|------------------------|--------|------------|-------------------|
-| Debian 8 (jessie)      | OK     | 2020-06    | (1) (2)           |
-| Debian 9 (stretch)     | OK     | 2022-06    | (2)               |
-| Debian 10 (buster)     | OK     | 2024       |                   |
-| Debian 11 (bullseye)   | OK     | TBA        |                   |
-| Debian 12 (bookworm)   | N/A    | TBA        | Not yet available |
-|------------------------|--------|------------|-------------------|
-| Ubuntu 16.04 (xenial)  | OK     | 2021-04    | (1) (2)           |
-| Ubuntu 16.10 (yakkety) |        | 2017-07-20 |                   |
-| Ubuntu 17.04 (zesty)   |        | 2018-01-13 |                   |
-| Ubuntu 17.10 (artful)  |        | 2018-07-19 |                   |
-| Ubuntu 18.04 (bionic)  | OK     | 2023-04    | (2)               |
-| Ubuntu 18.10 (cosmic)  |        | 2018-10-18 |                   |
-| Ubuntu 19.04 (disco)   |        | 2020-01-23 |                   |
-| Ubuntu 19.10 (eoan)    |        | 2020-07-17 |                   |
-| Ubuntu 20.04 (focal)   | OK     | 2025-04    |                   |
-| Ubuntu 20.10 (groovy)  |        | 2021-07    |                   |
-|------------------------|--------|------------|-------------------|
-| CentOS 7               | OK     | 2024-06-30 |                   |
-| CentOS 8               | OK     | 2029-05-31 |                   |
-|------------------------|--------|------------|-------------------|
-| Fedora 31              | OK     | N/A        |                   |
-| Fedora 32              | OK     | N/A        |                   |
-| Fedora 33              | N/A    | N/A        |                   |
-|------------------------|--------|------------|-------------------|
-| OpenSUSE 15.1          | OK     | 2020-11-22 |                   |
-| OpenSUSE 15.2          | OK     | 2021-12-31 |                   |
-|------------------------|--------|------------|-------------------|
-| Alpine 3.9             | OK     | 2020-11-01 |                   |
-| Alpine 3.10            | OK     | 2021-05-01 |                   |
-| Alpine 3.11            | OK     | 2021-11-01 |                   |
-| Alpine 3.12            | OK     | 2022-05-01 |                   |
+| Version                | Status | EOL                            | Restrictions      |
+|------------------------|--------|--------------------------------|-------------------|
+| Debian 8 (jessie)      | OK     | 2020-06                        | [^py2] [^xfs]     |
+| Debian 9 (stretch)     | OK     | 2022-06                        | [^xfs]            |
+| Debian 10 (buster)     | OK     | 2024                           |                   |
+| Debian 11 (bullseye)   | OK     | TBA                            |                   |
+| Debian 12 (bookworm)   | N/A    | TBA                            | Not yet available |
+|------------------------|--------|--------------------------------|-------------------|
+| Ubuntu 14.04 (trusty)  | OK     | LTS: 2019-04-30 / EMS: 2022-04 | [^py2] [^xfs]     |
+| Ubuntu 14.10 (utopic)  |        | 2015-07-23                     | Do not use        |
+| Ubuntu 15.04 (vivid)   |        | 2016-02-04                     | Do not use        |
+| Ubuntu 15.10 (wily)    |        | 2016-07-28                     | Do not use        |
+| Ubuntu 16.04 (xenial)  | OK     | LTS: 2021-04 / EMS: 2024-04    | [^py2] [^xfs]     |
+| Ubuntu 16.10 (yakkety) |        | 2017-07-20                     | Do not use        |
+| Ubuntu 17.04 (zesty)   |        | 2018-01-13                     | Do not use        |
+| Ubuntu 17.10 (artful)  |        | 2018-07-19                     | Do not use        |
+| Ubuntu 18.04 (bionic)  | OK     | LTS: 2023-04 / EMS: 2028-04    | [^xfs]            |
+| Ubuntu 18.10 (cosmic)  |        | 2018-10-18                     | Do not use        |
+| Ubuntu 19.04 (disco)   |        | 2020-01-23                     | Do not use        |
+| Ubuntu 19.10 (eoan)    |        | 2020-07-17                     | Do not use        |
+| Ubuntu 20.04 (focal)   | OK     | LTS: 2025-04 / EMS: 2030-04    |                   |
+| Ubuntu 20.10 (groovy)  |        | 2021-07                        |                   |
+|------------------------|--------|--------------------------------|-------------------|
+| CentOS 7               | OK     | 2024-06-30                     |                   |
+| CentOS 8               | OK     | 2029-05-31                     |                   |
+|------------------------|--------|--------------------------------|-------------------|
+| Fedora 31              | OK     | N/A                            |                   |
+| Fedora 32              | OK     | N/A                            |                   |
+| Fedora 33              | N/A    | N/A                            |                   |
+|------------------------|--------|--------------------------------|-------------------|
+| OpenSUSE 15.1          | OK     | 2020-11-22                     |                   |
+| OpenSUSE 15.2          | OK     | 2021-12-31                     |                   |
+|------------------------|--------|--------------------------------|-------------------|
+| Alpine 3.9             | OK     | 2020-11-01                     |                   |
+| Alpine 3.10            | OK     | 2021-05-01                     |                   |
+| Alpine 3.11            | OK     | 2021-11-01                     |                   |
+| Alpine 3.12            | OK     | 2022-05-01                     |                   |
 
 
 
-(1) Python2 in chroot. Use `-e chroot_python_interpreter='/usr/bin/python'` option.
+[^py2]: See [vars/main.yml] for python support in chroot.
 
-(2) XFS is not compatible between kernel 3.16 and 4.9
-mkfs.xfs version 3.2.1
-```
-versionnum [0xb4a4+0x8a] = V4,NLINK,ALIGN,DIRV2,LOGV2,EXTFLG,MOREBITS,ATTR2,LAZYSBCOUNT,PROJID32BIT
-meta-data=/dev/vdb               isize=256    agcount=4, agsize=6554 blks
-         =                       sectsz=512   attr=2, projid32bit=1
-         =                       crc=0        finobt=0
-data     =                       bsize=4096   blocks=26214, imaxpct=25
-         =                       sunit=0      swidth=0 blks
-naming   =version 2              bsize=4096   ascii-ci=0 ftype=0
-log      =internal log           bsize=4096   blocks=853, version=2
-         =                       sectsz=512   sunit=0 blks, lazy-count=1
-realtime =none                   extsz=4096   blocks=0, rtextents=0
-```
-
-mkfs.xfs version 4.20.0
-```
-xfs_db /dev/vdb -c version
-versionnum [0xb4a5+0x18a] = V5,NLINK,DIRV2,ALIGN,LOGV2,EXTFLG,MOREBITS,ATTR2,LAZYSBCOUNT,PROJID32BIT,CRC,FTYPE,FINOBT,SPARSE_INODES
-
-meta-data=/dev/vdb               isize=512    agcount=4, agsize=6554 blks
-         =                       sectsz=512   attr=2, projid32bit=1
-         =                       crc=1        finobt=1, sparse=1, rmapbt=0
-         =                       reflink=0
-data     =                       bsize=4096   blocks=26214, imaxpct=25
-         =                       sunit=0      swidth=0 blks
-naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
-log      =internal log           bsize=4096   blocks=855, version=2
-         =                       sectsz=512   sunit=0 blks, lazy-count=1
-realtime =none                   extsz=4096   blocks=0, rtextents=0
-```
+[^xfs4]: See [vars/main.yml] for xfs options support.
 
 
 ## Copyright
