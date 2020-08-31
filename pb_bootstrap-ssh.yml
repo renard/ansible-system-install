@@ -3,7 +3,7 @@
 # Copyright © 2020 Sébastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 
 # Created: 2020-02-20
-# Last changed: 2020-08-31 11:38:07
+# Last changed: 2020-08-31 22:55:33
 
 # This program is free software. It comes without any warranty, to
 # the extent permitted by applicable law. You can redistribute it
@@ -90,6 +90,7 @@
         system_install_partitions: '{{ system_install_partitions }}'
         system_install_pseudo_fs: '{{ system_install_pseudo_fs }}'
         system_install_ssh_chroot_pid: '{{ system_install_ssh_chroot_pid }}'
+        chroot_python_interpreter: '{{ chroot_python_interpreter | default((system_install_python[system_install_vendor] | default({}))[system_install_vendor_version] | default("/usr/bin/python3")) }}'
 
     # SSH server keys are not created by default on some distros.
     #
@@ -137,7 +138,7 @@
     #   time ./pb_bootstrap-ssh.yml -l centos7 \
     #      -e chroot_python_interpreter='/usr/bin/python'
     #
-    ansible_python_interpreter: '{{ chroot_python_interpreter | default("/usr/bin/python3") }}'
+    ansible_python_interpreter: '{{ chroot_python_interpreter }}'
 
 
   tasks:

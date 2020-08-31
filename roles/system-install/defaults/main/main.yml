@@ -98,7 +98,8 @@ system_install_partitions:
     filesystem:
       force: yes
       fstype: '{{ system_install_filesystem }}'
-      opts: -L SYSTEM
+      opts: '-L SYSTEM {{ (system_install_xfs_opts[system_install_vendor] | default({}))[system_install_vendor_version] | default("") }}'
+        #-m crc=0,finobt=0 -i sparse=0 -n ftype=0
     mount:
       path: /
   - name: grub
