@@ -115,7 +115,7 @@ more optimized images for PXE usage have a look at the `ramdisk` role.
 | Debian 10 (buster)     | OK     | 2024                           |                   |
 | Debian 11 (bullseye)   | OK     | TBA                            |                   |
 | Debian 12 (bookworm)   | N/A    | TBA                            | Not yet available |
-|------------------------|--------|--------------------------------|-------------------|
+|                        |        |                                |                   |
 | Ubuntu 14.04 (trusty)  | OK     | LTS: 2019-04-30 / EMS: 2022-04 | [^py2] [^xfs]     |
 | Ubuntu 14.10 (utopic)  |        | 2015-07-23                     | Do not use        |
 | Ubuntu 15.04 (vivid)   |        | 2016-02-04                     | Do not use        |
@@ -130,17 +130,17 @@ more optimized images for PXE usage have a look at the `ramdisk` role.
 | Ubuntu 19.10 (eoan)    |        | 2020-07-17                     | Do not use        |
 | Ubuntu 20.04 (focal)   | OK     | LTS: 2025-04 / EMS: 2030-04    |                   |
 | Ubuntu 20.10 (groovy)  |        | 2021-07                        |                   |
-|------------------------|--------|--------------------------------|-------------------|
+|                        |        |                                |                   |
 | CentOS 7               | OK     | 2024-06-30                     |                   |
 | CentOS 8               | OK     | 2029-05-31                     |                   |
-|------------------------|--------|--------------------------------|-------------------|
+|                        |        |                                |                   |
 | Fedora 31              | OK     | N/A                            |                   |
 | Fedora 32              | OK     | N/A                            |                   |
 | Fedora 33              | N/A    | N/A                            |                   |
-|------------------------|--------|--------------------------------|-------------------|
+|                        |        |                                |                   |
 | OpenSUSE 15.1          | OK     | 2020-11-22                     |                   |
 | OpenSUSE 15.2          | OK     | 2021-12-31                     |                   |
-|------------------------|--------|--------------------------------|-------------------|
+|                        |        |                                |                   |
 | Alpine 3.9             | OK     | 2020-11-01                     |                   |
 | Alpine 3.10            | OK     | 2021-05-01                     |                   |
 | Alpine 3.11            | OK     | 2021-11-01                     |                   |
@@ -148,9 +148,8 @@ more optimized images for PXE usage have a look at the `ramdisk` role.
 
 
 
-[^py2]: See [vars/main.yml] for python support in chroot.
-
-[^xfs4]: See [vars/main.yml] for xfs options support.
+[^py2]: See [vars/main.yml]() for python support in chroot.
+[^xfs]: See [vars/main.yml]() for xfs options support.
 
 
 ## Copyright
