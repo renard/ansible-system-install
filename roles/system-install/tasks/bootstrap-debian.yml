@@ -30,14 +30,14 @@
 - name: Process generic variables (debian)
   set_fact:
     _system_install_apt_mirror: '{{ system_install_debian_apt_mirror }}'
-    _system_install_apt_release: '{{ system_install_debian_apt_release }}'
+    _system_install_apt_release: '{{ system_install_debian_version }}'
     _system_install_apt_components: '{{ system_install_debian_apt_components }}'
   when: system_install_vendor == 'debian'
     
 - name: Process generic variables (ubuntu)
   set_fact:
     _system_install_apt_mirror: '{{ system_install_ubuntu_apt_mirror }}'
-    _system_install_apt_release: '{{ system_install_ubuntu_apt_release }}'
+    _system_install_apt_release: '{{ system_install_ubuntu_version }}'
     _system_install_apt_components: '{{ system_install_ubuntu_apt_components }}'
   when: system_install_vendor == 'ubuntu'
 

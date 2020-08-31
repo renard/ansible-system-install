@@ -1,6 +1,6 @@
 # Setup for Ubuntu
 system_install_ubuntu_apt_mirror: 'http://fr.archive.ubuntu.com/ubuntu/'
-system_install_ubuntu_apt_release: eoan
+system_install_ubuntu_version: focal
 system_install_ubuntu_apt_components:
   - main
   - restricted
@@ -9,7 +9,7 @@ system_install_ubuntu_apt_components:
 
 # Setup for Debian
 system_install_debian_apt_mirror: 'http://deb.debian.org/debian'
-system_install_debian_apt_release: buster
+system_install_debian_version: buster
 system_install_debian_apt_components:
   - main
   - contrib
