@@ -15,7 +15,6 @@ system_install_fedora_repositories:
 
 system_install_fedora_packages:
   ### Centos
-  - pkg: bash
   - pkg: yum
   - pkg: yum-utils
   - pkg: rootfiles
@@ -36,5 +35,6 @@ system_install_fedora_packages:
   - pkg: python3
   - pkg: python3-libselinux
   - pkg: dnf
+  - pkg: bash
 
 

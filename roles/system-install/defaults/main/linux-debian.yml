@@ -43,15 +43,16 @@ system_install_debian_packages:
   # Needed to create /etc/network directory
   - pkg: ifupdown
   #
-  - pkg: xfsprogs
-  - pkg: lvm2
   - pkg: openssh-server
   - pkg: grub-pc
   # - pkg: python
   - pkg: python3-apt
+  - pkg: isc-dhcp-client
+  #
   - pkg: cryptsetup
   - pkg: busybox
   - pkg: dropbear
   - pkg: lsb-release
   - pkg: mdadm
-  - pkg: isc-dhcp-client
+  - pkg: xfsprogs
+  - pkg: lvm2

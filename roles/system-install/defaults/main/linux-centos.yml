@@ -39,7 +39,6 @@ system_install_centos_gpg_keys_urls:
 
 system_install_centos_packages:
   ### Centos
-  - pkg: bash
   - pkg: yum
   - pkg: yum-utils
   - pkg: rootfiles
@@ -61,4 +60,4 @@ system_install_centos_packages:
   - pkg: python3-libselinux
   - pkg: dnf
 
-
+  - pkg: bash

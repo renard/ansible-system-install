@@ -17,25 +17,13 @@ system_install_opensuse_mirror: 'http://download.opensuse.org'
 #
 system_install_opensuse_repositories:
   # Base system
-  - name: BaseOS
+  - name: oss
     repo: '{{ system_install_opensuse_mirror }}/distribution/{{ system_install_opensuse_version }}/repo/oss'
     versions:
       - stable
-  # # Python
-  # - name: AppStream
-  #   baseurl: '{{ system_install_opensuse_mirror }}/opensuse/{{ system_install_opensuse_version }}/AppStream/{{ system_install_opensuse_arch }}/os/'
-  #   versions:
-  #     - 8
-
-  # # Base system
-  # - name: os
-  #   baseurl: '{{ system_install_opensuse_mirror }}/opensuse/{{ system_install_opensuse_version }}/os/{{ system_install_opensuse_arch }}'
-  #   versions:
-  #     - 7
 
 system_install_opensuse_packages:
   ### Centos
-  - pkg: bash
   - pkg: yum
   - pkg: yum-utils
   - pkg: zypper
@@ -43,11 +31,12 @@ system_install_opensuse_packages:
   - pkg: wget
   - pkg: sudo
   - pkg: kernel
-  - pkg: xfsprogs
   - pkg: grub2-i386-pc
   - pkg: dhcp-client
   - pkg: openssh
   # Centos 7
   - pkg: python3
+  - pkg: xfsprogs
+  - pkg: bash
 
 
