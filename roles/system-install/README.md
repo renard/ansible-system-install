@@ -7,12 +7,18 @@ lang: american
 
 # System install
 
-This Ansible role installs a Debian / Ubuntu on a remote host.
+This Ansible role installs a Linux system on a remote host. It can
+install [Debian](https://debian.org), [Ubuntu](https://ubuntu.com/),
+[CentOS](https://www.centos.org/), [Fedora](https://getfedora.org/),
+[OpenSUSE](https://www.opensuse.org/) and
+[Alpine](https://alpinelinux.org/) distributions.
 
 ## Prerequisite
 
-You will need to boot your server using a live CD or use a PXE boot that let
-your hard drive unused.
+You will need to boot your server using a live CD or use a PXE boot
+that let your hard drive unused. This role has been designed to run
+from recent Debian (Buster) distribution. It may also work with
+Ubuntu.
 
 You can find live images on following sites:
 
@@ -66,7 +72,7 @@ system after the reboot from hard drive.
 
 ## Configuration
 
-See specific documentation in `defaults/main.yml`.
+See specific documentation in defaults files in [defaults/main]().
 
 ## Extra
 
