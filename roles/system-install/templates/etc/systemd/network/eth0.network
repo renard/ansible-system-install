@@ -1,0 +1,5 @@
+[Match]
+Name={{ system_install_network_iface }}
+
+[Network]
+DHCP=yes

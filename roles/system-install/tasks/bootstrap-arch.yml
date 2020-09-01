@@ -1,0 +1,45 @@
+---
+# https://wiki.archlinux.org/index.php/Install_Arch_Linux_from_existing_Linux#Method_A:_Using_the_bootstrap_image_(recommended)
+
+- name: generate packages list (alpine)
+  set_fact:
+    _system_install_packages: '{{
+    (system_install_arch_packages + system_install_extra_arch_packages | default([]))
+    | json_query("[?state!=''absent''
+    && (
+    !contains(keys(@),''version'')
+    || contains(version, ''" + system_install_arch_version + "'')
+    )
+    ].pkg") | list
+    }}'
+
+  
+- name: Bootstrap Arch linux
+  unarchive:
+    src: '{{ system_install_arch_bootstrap_url }}'
+    dest: '{{ system_install_target }}'
+    extra_opts:
+      - '--transform'
+      - 's/^root.x86_64//'
+    creates: '{{ system_install_target }}/etc/os-release'
+    remote_src: yes
+      
+# - name: copy /etc/resolv.conf to chroot
+#   copy:
+#     src: /etc/resolv.conf
+#     dest: '{{ system_install_target }}/etc/resolv.conf'
+#     remote_src: yes
+
+- name: Activate initial mirror
+  lineinfile:
+    dest: '{{ system_install_target }}/etc/pacman.d/mirrorlist'
+    regexp: '^.*(Server\s*=\s*{{ system_install_arch_mirror }}.*)'
+    line: '\1'
+    backrefs: yes
+
+# See https://wiki.archlinux.org/index.php/Pacman/Rosetta
+
+# - name: Update pacman cache
+#   command:
+#     chroot '{{ system_install_target }}' pacman -Sy
+    

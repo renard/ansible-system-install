@@ -1,0 +1,67 @@
+## Some package have to be installed before
+
+- name: Update pacman cache
+  command:
+    chroot '{{ system_install_target }}' pacman -Sy
+
+- name: Generate pacman keys
+  command:
+    chroot '{{ system_install_target }}' pacman-key --init
+
+- name: Populate archlinux keys
+  command:
+    chroot '{{ system_install_target }}' pacman-key --populate archlinux
+
+- name: Update target directory
+  command:
+    chroot '{{ system_install_target }}' pacman -Syu --noconfirm
+
+# https://wiki.archlinux.org/index.php/Pacman/Rosetta
+- name: install packages
+  command: >-
+    chroot '{{ system_install_target }}' pacman -S --noconfirm
+    {{ _system_install_packages | join(" ") }}
+
+- name: Create required configuration files
+  template:
+    src: '{{ item.src }}'
+    dest: '{{ system_install_target }}/{{ item.dest | default(item.src) }}'
+  with_items:
+    - src: etc/mkinitcpio.conf
+      
+# /bin/bash /usr/sbin/mkinitcpio -k /boot/vmlinuz-linux-lts -c /etc/mkinitcpio.conf -g /boot/initramfs-linux-lts-fallback.img -S autodetect
+# - name: update initfs
+#   shell:
+#     chroot '{{ system_install_target }}' mkinitcpio -k $(ls '{{ system_install_target }}'/lib/modules/)
+
+## Basic grub setup.
+#
+- name: Configure grub
+  lineinfile:
+    dest: '{{ system_install_target }}/etc/default/grub'
+    regexp: '{{ item.r }}'
+    line: '{{ item.l }}'
+    backrefs: yes
+    create: yes
+  with_items:
+    - { r: '^.*(GRUB_HIDDEN_TIMEOUT\s*=.*)', l: '# \1' }
+    - { r: '^.*(GRUB_TERMINAL).*', l: '\1=console' }
+    - { r: '^.*(GRUB_CMDLINE_LINUX_DEFAULT).*' , l: '\1="{{ system_install_grub_linux_default | join(" ") }}"' }
+    - { r: '^.*(GRUB_TIMEOUT).*=.*', l: '\1=5' }
+    - { r: '^(.*(GRUB_RECORDFAIL_TIMEOUT).*=.*)|$', l: 'GRUB_RECORDFAIL_TIMEOUT=5' }
+    - { r: '^.*(GRUB_TIMEOUT_STYLE.*=.*)', l: '# \1' }
+
+
+
+- name: install grub
+  command:
+    chroot '{{ system_install_target }}' grub-install '{{ system_install_drive }}'
+
+- name: update grub configuration
+  command:
+    chroot '{{ system_install_target }}' grub-mkconfig -o /boot/grub/grub.cfg
+
+- name: kill gpg agent
+  command: >-
+    chroot '{{ system_install_target }}'
+    gpgconf --homedir /etc/pacman.d/gnupg --kill gpg-agent

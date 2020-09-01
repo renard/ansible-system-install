@@ -15,3 +15,5 @@
 - include_tasks: grub-alpine.yml    
   when: system_install_vendor == 'alpine'
 
+- include_tasks: grub-arch.yml
+  when: system_install_vendor == 'arch'

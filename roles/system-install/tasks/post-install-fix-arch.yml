@@ -1,0 +1,12 @@
+- name: Deploy network configuration file
+  template:
+    src: etc/systemd/network/eth0.network
+    dest: '{{ system_install_target }}/etc/systemd/network/{{ system_install_network_iface }}.network'
+  
+- name: enable networking
+  command:
+    chroot '{{ system_install_target }}' systemctl enable systemd-networkd
+
+- name: enable sshd
+  command:
+    chroot '{{ system_install_target }}' systemctl enable sshd

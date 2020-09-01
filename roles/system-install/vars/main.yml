@@ -8,12 +8,13 @@
 #
 # TODO: Do not forget to add new item when a new vendor is supported.
 system_install_vendor_versions:
-  opensuse: '{{ system_install_opensuse_version }}'
-  centos: '{{ system_install_centos_version }}'
-  fedora: '{{ system_install_fedora_version }}'
-  ubuntu: '{{ system_install_ubuntu_version }}'
-  debian: '{{ system_install_debian_version }}'
   alpine: '{{ system_install_alpine_version }}'
+  arch: '{{ system_install_arch_version }}'
+  centos: '{{ system_install_centos_version }}'
+  debian: '{{ system_install_debian_version }}'
+  fedora: '{{ system_install_fedora_version }}'
+  opensuse: '{{ system_install_opensuse_version }}'
+  ubuntu: '{{ system_install_ubuntu_version }}'
 system_install_vendor_version: '{{ system_install_vendor_versions[system_install_vendor] }}'
 
 ## Python interpreter in the chroot
@@ -62,6 +63,8 @@ system_install_pseudo_fs:
     creates: devices
   - fs: /run
     creates: sshd
+  - fs: /sys
+    creates: module
 
 
 ## XFS options

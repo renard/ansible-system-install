@@ -26,3 +26,6 @@
 
 - include_tasks: bootstrap-alpine.yml
   when: system_install_vendor == 'alpine'
+
+- include_tasks: bootstrap-arch.yml
+  when: system_install_vendor == 'arch'

@@ -24,6 +24,9 @@
 - include_tasks: post-install-fix-alpine.yml
   when: system_install_vendor == 'alpine'
 
+- include_tasks: post-install-fix-arch.yml
+  when: system_install_vendor == 'arch'
+
 ## Dbus could not find its runtime directory.
 #
 # See

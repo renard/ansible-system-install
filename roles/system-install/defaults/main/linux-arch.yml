@@ -1,0 +1,36 @@
+system_install_arch_version: 2020.08.01
+system_install_arch_arch: x86_64
+system_install_arch_mirror: 'https://mirror.rackspace.com/archlinux'
+
+system_install_arch_bootstrap_url: '{{ system_install_arch_mirror }}/iso/{{ system_install_arch_version }}/archlinux-bootstrap-{{ system_install_arch_version }}-{{ system_install_arch_arch }}.tar.gz'
+
+
+system_install_arch_packages:
+  - pkg: base
+  - pkg: linux-lts
+  - pkg: grub
+  - pkg: dhclient
+  - pkg: xfsprogs
+  - pkg: openssh
+  #- pkg: openssl
+  - pkg: sudo
+  #- pkg: netctl
+  - pkg: python
+#   - pkg: alpine-base
+#   - pkg: iproute2
+#   - pkg: openssh
+#   - pkg: linux-vanilla
+#     version:
+#       - v3.9
+#       - v3.10
+#   - pkg: linux-lts
+#     version:
+#       - v3.11
+#       - v3.12
+#       - latest-stable
+#   - pkg: xfsprogs-extra
+#   - pkg: grub
+#   - pkg: grub-bios
+#   - pkg: dhclient
+#   - pkg: sudo
+#   - pkg: tar

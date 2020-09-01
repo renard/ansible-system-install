@@ -14,7 +14,6 @@
     and system_install_base != omit
     and system_install_base != ''
 
-- include: root-access.yml
 
 # Pseudo filesystems are required for grub operations and some package
 # installations.
@@ -42,15 +41,17 @@
     remote_src: yes
 
 # Copy 
-- name: copy /etc/resolv.conf to chroot (Centos like)
+- name: copy /etc/resolv.conf to chroot
   copy:
     src: /etc/resolv.conf
     dest: '{{ system_install_target }}/etc/resolv.conf'
     remote_src: yes
-  when: system_install_vendor in [ 'centos' ]
+  when: system_install_vendor in [ 'centos', 'arch' ]
 
     
 - include: grub.yml    
 
 - include: post-install-fix.yml
+
+- include: root-access.yml
 
