@@ -1,3 +1,32 @@
+## Convenient way to retrieve the distribution version
+#
+# system_install_vendor_versions is a dict of vendors with associated
+# version to install used by system_install_vendor_version.
+#
+# system_install_vendor_version extract version to install from
+# system_install_vendor_versions.
+#
+# TODO: Do not forget to add new item when a new vendor is supported.
+system_install_vendor_versions:
+  opensuse: '{{ system_install_opensuse_version }}'
+  centos: '{{ system_install_centos_version }}'
+  fedora: '{{ system_install_fedora_version }}'
+  ubuntu: '{{ system_install_ubuntu_version }}'
+  debian: '{{ system_install_debian_version }}'
+  alpine: '{{ system_install_alpine_version }}'
+system_install_vendor_version: '{{ system_install_vendor_versions[system_install_vendor] }}'
+
+## Python interpreter in the chroot
+#
+# Some old systems do not provide python 3.6. In that case python 2.x
+# has to be used.
+system_install_python:
+  debian:
+    jessie: '/usr/bin/python'
+  ubuntu:
+    trusty: '/usr/bin/python'
+    xenial: '/usr/bin/python'
+
 ## Add debootstrap scripts for recent distributions
 #
 # Debootstrap is not always up-to-date. Create links to support recent
@@ -33,3 +62,29 @@ system_install_pseudo_fs:
     creates: devices
   - fs: /run
     creates: sshd
+
+
+## XFS options
+#
+# XFSv5 is only available since kernel 4.3. See
+# https://kernelnewbies.org/Linux_4.3
+#
+# xfsprogs 4.16.0 defaults to enabling "sparse inode" by default. Grub
+# version before 2.02+dfsg1-14 do no handle properly this option. See:
+# - https://lists.gnu.org/archive/html/grub-devel/2018-05/msg00046.html
+# - https://packages.debian.org/sid/grub-pc (See Debian Changelog)
+#
+# system_install_xfs_opts is a vendor / version dict defining xfs
+# options. If a key is missing, defaults options from mkfs.xfs are
+# used.
+system_install_xfs_options_v4: '-m crc=0,finobt=0 -i sparse=0 -n ftype=0'
+system_install_xfs_options_nosparse: '-i sparse=0'
+system_install_xfs_opts:
+  debian:
+    jessie: '{{ system_install_xfs_options_v4 }}'
+    stretch: '{{ system_install_xfs_options_nosparse }}'
+  ubuntu:
+    trusty: '{{ system_install_xfs_options_v4 }}'
+    xenial: '{{ system_install_xfs_options_nosparse }}'
+    bionic: '{{ system_install_xfs_options_nosparse }}'
+
