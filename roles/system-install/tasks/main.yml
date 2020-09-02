@@ -31,7 +31,7 @@
   
 - include: grub.yml    
 
-- include: post-install-fix.yml
+- include: post-install.yml
 
 - include: root-access.yml
 

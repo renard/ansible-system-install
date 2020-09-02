@@ -12,19 +12,19 @@
     and item.filesystem is defined
   with_items: '{{ system_install_partitions }}'
 
-- include_tasks: post-install-fix-debian.yml
+- include_tasks: post-install-debian.yml
   when: system_install_vendor in [ 'debian', 'ubuntu' ]
 
-- include_tasks: post-install-fix-centos.yml
+- include_tasks: post-install-centos.yml
   when: system_install_vendor in [ 'centos', 'fedora' ]
 
-- include_tasks: post-install-fix-opensuse.yml
+- include_tasks: post-install-opensuse.yml
   when: system_install_vendor == 'opensuse'
 
-- include_tasks: post-install-fix-alpine.yml
+- include_tasks: post-install-alpine.yml
   when: system_install_vendor == 'alpine'
 
-- include_tasks: post-install-fix-arch.yml
+- include_tasks: post-install-arch.yml
   when: system_install_vendor == 'arch'
 
 ## Dbus could not find its runtime directory.
