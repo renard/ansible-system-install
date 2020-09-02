@@ -133,6 +133,12 @@ root. The archive is not minimalistic but is a good start.
 [^py2]: See [vars/main.yml]() for python support in chroot.
 [^xfs]: See [vars/main.yml]() for xfs options support.
 
+## Todo / roadmap
+
+In no specific priority:
+
+* Allow to configure static IP address.
+* Add more vendors (stay focus on server oriented distros).
 
 ## Copyright
 
