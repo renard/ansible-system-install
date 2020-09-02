@@ -1,0 +1,6 @@
+# Debian setup forces dbpath to ~/.rpmdb which results to an empty
+# database after system bootstrapping.
+#
+# Reset the dbpath to its default value.
+
+%_dbpath %{_var}/lib/rpm

@@ -20,6 +20,11 @@
     update_cache: yes
     cache_valid_time: 3600
 
+- name: Setup rpm macros
+  copy:
+    src: usr/lib/rpm/macros.d/macros.bootstrap
+    dest: /usr/lib/rpm/macros.d/macros.bootstrap
+
 - name: deploy yum source file
   yum_repository:
     name: 'bootstrap-{{ item.name }}'

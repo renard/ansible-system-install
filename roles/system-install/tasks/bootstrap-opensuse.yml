@@ -22,6 +22,11 @@
     update_cache: yes
     cache_valid_time: 3600
 
+- name: Setup rpm macros
+  copy:
+    src: usr/lib/rpm/macros.d/macros.bootstrap
+    dest: /usr/lib/rpm/macros.d/macros.bootstrap
+
 # Zypper repository does not support a specific file destination so it
 # cannot be added in the chroot target using zypper_repository.
 - name: deploy zypper source file
