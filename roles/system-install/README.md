@@ -10,16 +10,17 @@ lang: american
 This Ansible role installs a Linux system on a remote host. It can
 install [Debian](https://debian.org), [Ubuntu](https://ubuntu.com/),
 [CentOS](https://www.centos.org/), [Fedora](https://getfedora.org/),
-[OpenSUSE](https://www.opensuse.org/) and
-[Alpine](https://alpinelinux.org/)
+[OpenSUSE](https://www.opensuse.org/),
+[Alpine](https://alpinelinux.org/), and
 [Archlinux](https://www.archlinux.org/) distributions.
 
 ## Prerequisite
 
 You will need to boot your server using a live CD or use a PXE boot
 that let your hard drive unused. This role has been designed to
-against run against a recent Debian (Buster) distribution. It may also
-work from older Debian live CD or with Ubuntu live CD.
+against run against a recent Debian (Buster) system (understand a
+machine booted with a Debian live CD). It may also work from older
+Debian live CD or with Ubuntu live CD.
 
 You can find live images on following sites:
 
@@ -54,9 +55,10 @@ provider. Please check your provider support.
 
 The install process runs in several parts:
 
-- Install *debootstrap* and required tools.
 - Remove all partitions and create a new partition scheme (see
   `system_install_partitions` variable).
+- Install deployment tools (such as *debootstrap*, *yum*, *apk*...)
+  depending on the target system.
 - Bootstrap the system and install additional packages (see
   `system_install_additional_packages`).
 - Fix *ssh* configuration to allow **root** login (`PermitRootLogin` is set
