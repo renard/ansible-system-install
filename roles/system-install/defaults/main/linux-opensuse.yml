@@ -2,7 +2,7 @@
 ## opensuse version and architechtures
 #
 # See http://download.opensuse.org/distribution/
-system_install_opensuse_version: stable
+system_install_opensuse_version: leap/15.2
 system_install_opensuse_arch: x86_64
 
 ## Mirror to use
