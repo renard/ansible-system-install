@@ -11,7 +11,8 @@ This Ansible role installs a Linux system on a remote host. It can
 install [Debian](https://debian.org), [Ubuntu](https://ubuntu.com/),
 [CentOS](https://www.centos.org/), [Fedora](https://getfedora.org/),
 [OpenSUSE](https://www.opensuse.org/) and
-[Alpine](https://alpinelinux.org/) distributions.
+[Alpine](https://alpinelinux.org/)
+[Archlinux](https://www.archlinux.org/) distributions.
 
 ## Prerequisite
 
@@ -151,7 +152,10 @@ more optimized images for PXE usage have a look at the `ramdisk` role.
 | Alpine 3.10            | OK     | 2021-05-01                     |                   |
 | Alpine 3.11            | OK     | 2021-11-01                     |                   |
 | Alpine 3.12            | OK     | 2022-05-01                     |                   |
-
+|                        |        |                                |                   |
+| Archlinux 2020.07.01   | OK     | N/A                            |                   |
+| Archlinux 2020.08.01   | OK     | N/A                            |                   |
+| Archlinux 2020.09.01   | OK     | N/A                            |                   |
 
 
 [^py2]: See [vars/main.yml]() for python support in chroot.
