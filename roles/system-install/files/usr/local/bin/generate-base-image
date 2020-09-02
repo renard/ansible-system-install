@@ -54,17 +54,18 @@ tar --anchored \
     --exclude './etc/ssh/ssh_host_*key*' \
     --exclude './tmp/*' \
     --exclude './tmp/.*' \
-    --exclude './var/tmp/*' \
-    --exclude './var/tmp/.*' \
+    --exclude './var/backups/*' \
+    --exclude './var/cache/**/*' \
     --exclude './var/log/**/*' \
-    --exclude './var/log/*.gz' \
     --exclude './var/log/*.1' \
+    --exclude './var/log/*.err' \
+    --exclude './var/log/*.gz' \
     --exclude './var/log/*log' \
     --exclude './var/log/*tmp' \
-    --exclude './var/log/*.err' \
-    --exclude './var/cache/**/*' \
+    --exclude './var/run/*' \
     --exclude './var/spool/**/*' \
-    --exclude './var/backups/*' \
+    --exclude './var/tmp/*' \
+    --exclude './var/tmp/.*' \
     -C / \
     -czvf /tmp/$vendor$version-$arch.tgz .
 
