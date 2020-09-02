@@ -1,7 +1,7 @@
 ---
 # https://wiki.archlinux.org/index.php/Install_Arch_Linux_from_existing_Linux#Method_A:_Using_the_bootstrap_image_(recommended)
 
-- name: generate packages list (alpine)
+- name: generate packages list (Arch)
   set_fact:
     _system_install_packages: '{{
     (system_install_arch_packages + system_install_extra_arch_packages | default([]))
