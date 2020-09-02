@@ -27,28 +27,8 @@
     warn: false
   with_items: '{{ system_install_pseudo_fs }}'
 
-# Allows name resolving in the chroot environment. This is only required for
-# operations in the chroot.
-- name: ensure /run/resolvconf exists
-  file:
-    path: /run/resolvconf
-    state: directory
-
-- name: copy /etc/resolv.conf to /run/resolvconf
-  copy:
-    src: /etc/resolv.conf
-    dest: /run/resolvconf
-    remote_src: yes
-
-# Copy 
-- name: copy /etc/resolv.conf to chroot
-  copy:
-    src: /etc/resolv.conf
-    dest: '{{ system_install_target }}/etc/resolv.conf'
-    remote_src: yes
-  when: system_install_vendor in [ 'centos', 'arch' ]
-
-    
+- include: resolvconf.yml
+  
 - include: grub.yml    
 
 - include: post-install-fix.yml
