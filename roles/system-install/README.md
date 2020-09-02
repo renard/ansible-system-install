@@ -79,39 +79,9 @@ See specific documentation in defaults files in [defaults/main]().
 
 ## Extra
 
-If you want to create an image of you newly installed system for future
-usage, you can run the following command as root:
-
-
-```
-tar --anchored --preserve-permissions --numeric-owner \
-  --xattrs --xattrs-include '*' --selinux --acls --one-file-system \
-  --exclude './**/lost+found/*' \
-  --exclude './**/dead.letter' \
-  --exclude './**/.bash_history' \
-  --exclude './**/.ansible' \
-  --exclude './proc/*' \
-  --exclude './dev/*' \
-  --exclude './sys/*' \
-  --exclude './run/*' \
-  --exclude './tmp/*' \
-  --exclude './tmp/.*' \
-  --exclude './var/tmp/*' \
-  --exclude './var/log/**/*' \
-  --exclude './var/log/*.gz' \
-  --exclude './var/log/*.1' \
-  --exclude './var/log/*log' \
-  --exclude './var/log/*tmp' \
-  --exclude './var/log/*.err' \
-  --exclude './var/cache/**/*' \
-  --exclude './var/spool/**/*' \
-  --exclude './var/backups/*' \
-  -C / \
-  -czvf /tmp/`lsb_release -si | tr '[A-Z]' '[a-z]'`-`lsb_release -sc`-`dpkg --print-architecture`.tgz .
-```
-
-The archive is not minimalistic but is a good start. If you want to create
-more optimized images for PXE usage have a look at the `ramdisk` role.
+If you want to create an image of you newly installed system for
+future usage, you can run `/usr/local/bin/generate-base-image` as
+root. The archive is not minimalistic but is a good start.
 
 
 ## Tested versions

@@ -1,0 +1,70 @@
+#!/bin/sh
+
+#
+# Generates a tarball archive of a system. This can be used to create
+# customized installation images suitable for system-install.
+#
+
+if test "$(id -un)" != root; then
+    cat<<EOF >&2
+run me as root: sudo $(basename $0)
+EOF
+    exit 1
+fi
+
+if test -e /etc/os-release; then
+    source /etc/os-release
+fi
+
+# In case vendor could not be determined.
+if test -n "$ID"; then
+    vendor=$ID
+else
+    vendor=UnknownVendor
+fi
+
+# In case version could not be determined.
+if test -n "$VERSION_ID"; then
+    version="-$VERSION_ID"
+fi
+
+# dpkg based distos use amd64 instead of x86_64.
+if test -e /usr/bin/dpkg; then
+    arch=$(dpkg --print-architecture)
+else
+    arch=$(uname -m)
+fi
+
+tar --anchored \
+    --preserve-permissions \
+    --numeric-owner \
+    --xattrs --xattrs-include '*' \
+    --selinux \
+    --acls \
+    --one-file-system \
+    --exclude './**/lost+found' \
+    --exclude './**/dead.letter' \
+    --exclude './**/.bash_history' \
+    --exclude './**/.ash_history' \
+    --exclude './**/.ansible' \
+    --exclude './proc/*' \
+    --exclude './dev/*' \
+    --exclude './sys/*' \
+    --exclude './run/*' \
+    --exclude './etc/ssh/ssh_host_*key*' \
+    --exclude './tmp/*' \
+    --exclude './tmp/.*' \
+    --exclude './var/tmp/*' \
+    --exclude './var/tmp/.*' \
+    --exclude './var/log/**/*' \
+    --exclude './var/log/*.gz' \
+    --exclude './var/log/*.1' \
+    --exclude './var/log/*log' \
+    --exclude './var/log/*tmp' \
+    --exclude './var/log/*.err' \
+    --exclude './var/cache/**/*' \
+    --exclude './var/spool/**/*' \
+    --exclude './var/backups/*' \
+    -C / \
+    -czvf /tmp/$vendor$version-$arch.tgz .
+

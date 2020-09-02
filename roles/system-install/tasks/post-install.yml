@@ -39,3 +39,11 @@
     creates: '{{ system_install_target }}/var/run/dbus'
     warn: false
   when: system_install_vendor in [ 'centos', 'fedora', 'opensuse' ]
+
+- name: Deploy generate-base script
+  copy:
+    src: usr/local/bin/generate-base-image
+    dest: '{{ system_install_target }}/usr/local/bin/generate-base-image'
+    owner: root
+    group: root
+    mode: '0750'
