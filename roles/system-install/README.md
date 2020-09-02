@@ -16,9 +16,9 @@ install [Debian](https://debian.org), [Ubuntu](https://ubuntu.com/),
 ## Prerequisite
 
 You will need to boot your server using a live CD or use a PXE boot
-that let your hard drive unused. This role has been designed to run
-from recent Debian (Buster) distribution. It may also work with
-Ubuntu.
+that let your hard drive unused. This role has been designed to
+against run against a recent Debian (Buster) distribution. It may also
+work from older Debian live CD or with Ubuntu live CD.
 
 You can find live images on following sites:
 
