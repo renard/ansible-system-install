@@ -9,7 +9,7 @@ system_install_ubuntu_apt_components:
 
 # Setup for Debian
 system_install_debian_apt_mirror: 'http://deb.debian.org/debian'
-system_install_debian_version: buster
+system_install_debian_version: stable
 system_install_debian_apt_components:
   - main
   - contrib

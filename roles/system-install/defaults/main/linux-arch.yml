@@ -1,4 +1,4 @@
-system_install_arch_version: 2020.08.01
+system_install_arch_version: latest
 system_install_arch_arch: x86_64
 system_install_arch_mirror: 'https://mirror.rackspace.com/archlinux'
 

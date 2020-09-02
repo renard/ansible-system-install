@@ -1,6 +1,6 @@
   
 ## centos version and architechtures
-system_install_centos_version: 7
+system_install_centos_version: 8
 system_install_centos_arch: x86_64
 
 ## Mirror to use
