@@ -46,6 +46,7 @@ system_install_debian_packages:
   - pkg: openssh-server
   - pkg: grub-pc
   # - pkg: python
+  - pkg: gpg
   - pkg: python3-apt
   - pkg: isc-dhcp-client
   - pkg: xfsprogs

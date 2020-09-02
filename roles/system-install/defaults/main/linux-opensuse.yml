@@ -37,6 +37,7 @@ system_install_opensuse_packages:
   # Centos 7
   - pkg: python3
   - pkg: xfsprogs
+  - pkg: tar
   - pkg: bash
 
 

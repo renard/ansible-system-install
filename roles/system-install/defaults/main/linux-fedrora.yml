@@ -35,6 +35,7 @@ system_install_fedora_packages:
   - pkg: python3
   - pkg: python3-libselinux
   - pkg: dnf
+  - pkg: tar
   - pkg: bash
 
 
