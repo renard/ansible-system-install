@@ -3,7 +3,7 @@
 # Copyright © 2020 Sébastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 
 # Created: 2020-02-20
-# Last changed: 2020-08-31 22:55:33
+# Last changed: 2020-09-11 00:33:33
 
 # This program is free software. It comes without any warranty, to
 # the extent permitted by applicable law. You can redistribute it
@@ -62,6 +62,12 @@
     # system_install_base: []
 
   pre_tasks:
+
+    - name: check for ssh pid in chroot
+      stat:
+        path: '{{ system_install_ssh_chroot_pid }}'
+      register: _system_install_ssh_chroot_pid
+
     - block:
 
         # Killing sshd does not remove existing active connections.
@@ -69,13 +75,13 @@
           shell:
             pkill -P $(cat '{{ system_install_ssh_chroot_pid }}')
 
+        # Now kill the ssh server itself.
         - name: Stop ssh server in chroot (may safely fail)
           command:
             pkill -F '{{ system_install_ssh_chroot_pid }}'
 
       ignore_errors: yes
-      # For some reason this check is not working
-      # when: system_install_ssh_chroot_pid is file
+      when: _system_install_ssh_chroot_pid.stat.exists
 
   roles:
     # Install the machine. See system-install role for more customization.
