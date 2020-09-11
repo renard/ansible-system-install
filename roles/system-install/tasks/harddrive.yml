@@ -5,39 +5,23 @@
     pkg:
       - parted
       - xfsprogs
+      - fai-setup-storage
+      - patch
+      - mdadm
+      - cryptsetup
     update_cache: yes
     install_recommends: no
     cache_valid_time: 3600
 
-- name: copy list-hard-drives script
-  copy:
-    src: usr/local/sbin/list-hard-drives
-    dest: /usr/local/sbin/list-hard-drives
-    owner: root
-    group: root
-    mode: '0755'
-
-- name: Find first hard drive
-  block:
-    
-    - name: List all hard drives
-      command:
-        /usr/local/sbin/list-hard-drives
-      register: _system_install_drives
-        
-    - name: set installer_drive
-      set_fact:
-        system_install_drive: '{{ _system_install_drives.stdout_lines[0] }}'
-        
-  when: system_install_drive is not defined
-
+- name: Patch setup-storage to get a list of boot devices
+  patch:
+    src: usr/sbin/setup-storage.patch
+    dest: /usr/sbin/setup-storage
+    strip: 0
+    remote_src: False
+      
 - name: Partition the hard drive
   block:
-    
-    - name: List partitions
-      parted:
-        device: '{{ system_install_drive }}'
-      register: _system_install_partitions
 
     - name: umount pseudo file systems from the chroot target
       mount:
@@ -45,55 +29,65 @@
         state: unmounted
       with_items: '{{ system_install_pseudo_fs | reverse | list }}'
 
-    # in case previous installation failed
-    - name: unmount target partition
+    # Find mounted patitions in case previous installation failed.
+    - name: Find mounted partitions
+      shell: |
+         mount | awk '{print $3}' \
+         | grep '^{{ system_install_target }}\($\|/\)' \
+         | sort -r
+      args:
+        warn: false
+      changed_when: false
+      failed_when: false
+      register: _system_install_mounted
+
+    # Umount patitions in case previous installation failed.
+    - name: umount file systems from the chroot target
       mount:
-        src: '{{ system_install_drive }}{{ item.number }}'
-        path: '{{ system_install_target }}/{{ item.mount.path }}'
-        fstype: '{{ item.filesystem.fstype }}'
+        path: '{{ item }}'
         state: unmounted
-      when:
-        item.mount is defined
-        and item.filesystem is defined
-      with_items: '{{ system_install_partitions }}'
+      with_items: '{{ (_system_install_mounted.stdout_lines | default([])) | list }}'
 
-    - name: Remove all partitions
-      parted:
-        device: '{{ system_install_drive }}'
-        number: '{{ item.num }}'
-        state: absent
-      with_items: '{{ _system_install_partitions.partitions }}'
-    
-    - name: Partition the hard drive
-      parted:
-        device: '{{ system_install_drive }}'
-        label: '{{ item.label | default("gpt") }}'
-        number: '{{ item.number }}'
-        name: '{{ item.name }}'
-        part_start: '{{ item.part_start }}'
-        part_end: '{{ item.part_end }}'
-        state: '{{ item.state | default("present") }}'
-        flags: '{{ item.flags | default(omit) }}'
-      with_items: '{{ system_install_partitions }}'
-
-    - name: Format partitions
-      filesystem:
-        dev: '{{ system_install_drive }}{{ item.number }}'
-        fstype: '{{ item.filesystem.fstype }}'
-        opts: '{{ item.filesystem.opts | default(omit) }}'
-        resizefs: '{{ item.filesystem.resizefs | default(False) }}'
-        force: '{{ item.filesystem.force | default(False) }}'
-      when: item.filesystem is defined
-      with_items: '{{ system_install_partitions }}'
-  when: not system_install_skip_partition
+    - name: Copy setup-storage configuration file
+      template:
+        src: '{{ system_install_setup_storage_conf }}'
+        dest: /tmp/setup-storage.conf
+        validate: setup-storage -s -f %s
       
-- name: mount target partition
-  mount:
-    src: '{{ system_install_drive }}{{ item.number }}'
-    path: '{{ system_install_target }}/{{ item.mount.path }}'
-    fstype: '{{ item.filesystem.fstype }}'
-    state: mounted
-  when:
-    item.mount is defined
-    and item.filesystem is defined
-  with_items: '{{ system_install_partitions }}'
+    ## In case of failure stop md / lvm etc... devices
+    #
+    #   mdadm --stop /dev/md0
+    #
+    - name: Create filesystems
+      command:
+        setup-storage -f /tmp/setup-storage.conf -X -y
+
+  when: not system_install_skip_partition
+
+- name: Mount partitions from the hard drive
+  block:
+
+    # TODO: handle case when setup-storage hasn't been run
+    - name: retrieve data from setup-storage
+      slurp:
+        path: /tmp/fai/disk_var.yml
+      register: _system_install_setup_storage
+
+    # Read fstap and mount all partitions
+    - name: read fstab
+      shell: |-
+        grep -v '^#' /tmp/fai/fstab | grep . \
+        | awk '{print "  - { src:",$1,",path:",$2,",fstype:",$3,"}"}'
+      register: _system_install_fstab
+    
+    - set_fact:
+        system_install_drive: '{{ (_system_install_setup_storage.content | b64decode | from_yaml).PHYSICAL_BOOT_DEVICES }}'
+        system_install_partitions: '{{ _system_install_fstab.stdout | from_yaml }}'
+    
+    - name: mount target partition
+      mount:
+        src: '{{ item.src }}'
+        path: '{{ system_install_target }}/{{ item.path }}'
+        fstype: '{{ item.fstype }}'
+        state: mounted
+      with_items: '{{ system_install_partitions }}'

@@ -1,7 +1,7 @@
 ---
 
 - include: harddrive.yml
-
+    
 - include: bootstrap.yml
   when:
     system_install_base is not defined

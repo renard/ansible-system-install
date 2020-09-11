@@ -213,14 +213,9 @@
         
     - name: Unmount target partition
       mount:
-        src: '{{ system_install_drive }}{{ item.number }}'
-        path: '{{ system_install_target }}/{{ item.mount.path }}'
-        fstype: '{{ item.filesystem.fstype }}'
+        path: '{{ system_install_target }}/{{ item.fs }}'
         state: unmounted
-      when:
-        item.mount is defined
-        and item.filesystem is defined
-      with_items: '{{ system_install_partitions }}'
+      with_items: '{{ system_install_partitions | reverse | list }}'
 
     - name: Reboot message
       debug:

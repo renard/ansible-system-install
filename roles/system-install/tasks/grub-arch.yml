@@ -55,7 +55,8 @@
 
 - name: install grub
   command:
-    chroot '{{ system_install_target }}' grub-install '{{ system_install_drive }}'
+    chroot '{{ system_install_target }}' grub-install '{{ item }}'
+  with_items: '{{ system_install_drive }}'
 
 - name: update grub configuration
   command:

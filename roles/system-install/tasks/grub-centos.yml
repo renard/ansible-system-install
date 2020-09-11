@@ -12,4 +12,5 @@
 
 - name: Install grub (Centos)
   command:
-    chroot '{{ system_install_target }}' grub2-install '{{ system_install_drive }}'
+    chroot '{{ system_install_target }}' grub2-install '{{ item }}'
+  with_items: '{{ system_install_drive }}'

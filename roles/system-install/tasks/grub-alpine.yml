@@ -8,7 +8,8 @@
 
 - name: install grub
   command:
-    chroot '{{ system_install_target }}' grub-install '{{ system_install_drive }}'
+    chroot '{{ system_install_target }}' grub-install '{{ item }}'
+  with_items: '{{ system_install_drive }}'
     
 ## TODO: Find a way to figureout installed kernel
 - name: update initfs
