@@ -1,0 +1,50 @@
+- include: cleanup-sshd.yml
+
+- include: stage-1/harddrive.yml
+    
+- include: stage-1/bootstrap.yml
+  when:
+    system_install_base is not defined
+      or system_install_base == omit
+      or system_install_base == ''
+
+- include: stage-1/base.yml
+  when:
+    system_install_base is defined
+    and system_install_base != omit
+    and system_install_base != ''
+
+
+# Pseudo filesystems are required for grub operations and some package
+# installations.
+#
+# TODO: explain why ansible mount cannot be used.
+- name: mount pseudo file systems
+  command:
+    mount -o bind '{{ item.fs }}' '{{ system_install_target }}/{{ item.fs }}'
+  args:
+    creates: '{{ system_install_target }}/{{ item.fs }}/{{ item.creates }}'
+    warn: false
+  with_items: '{{ system_install_pseudo_fs }}'
+
+
+
+- include: stage-1/resolvconf.yml
+  
+- include: stage-1/grub.yml    
+
+- include: stage-1/post-install.yml
+
+- include: stage-1/root-access.yml
+
+# Variables are not available between diffrent plays but those stored
+# using set_fact. Some of them are required later.
+- name: store persistant facts
+  set_fact:
+    system_install_target: '{{ system_install_target }}'
+    system_install_partitions: '{{ system_install_partitions }}'
+    system_install_pseudo_fs: '{{ system_install_pseudo_fs }}'
+    system_install_ssh_chroot_pid: '{{ system_install_ssh_chroot_pid }}'
+    chroot_python_interpreter: '{{ chroot_python_interpreter | default((system_install_python[system_install_vendor] | default({}))[system_install_vendor_version] | default("/usr/bin/python3")) }}'
+
+- include: stage-1/ssh.yml

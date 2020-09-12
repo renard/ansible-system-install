@@ -1,0 +1,5 @@
+- include: stage-2/debian/systemd-resolved.yml
+  when: system_install_fix_systemd_resolved
+
+- include: stage-2/debian/systemd-networkd.yml
+  when: system_install_fix_systemd_networkd

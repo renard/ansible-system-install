@@ -1,0 +1,31 @@
+##
+## traditional ifupdown is used instead of systemd mess.
+##
+
+- name: install ifupdown package
+  apt:
+    pkg: ifupdown
+    update_cache: yes
+    cache_valid_time: 3600
+    install_recommends: no
+
+- name: removing netplan package
+  apt:
+    name: 
+      - nplan
+      - netplan.io
+    purge: yes
+    state: absent
+
+- name: disabling systemd-networkd
+  systemd:
+    name: '{{ item }}'
+    state: stopped
+    enabled: no
+    masked: yes
+  with_items:
+    - systemd-networkd.socket
+    - systemd-networkd
+    - networkd-dispatcher
+    - systemd-networkd-wait-online
+ 

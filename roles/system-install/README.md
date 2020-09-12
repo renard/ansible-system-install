@@ -66,6 +66,8 @@ The install process runs in several parts:
 - Update *grub* configuration to be more verbose and install it on the hard
   drive.
 
+See [tasks/README.md]() for further details on how system install works.
+
 
 ### Security warning
 
@@ -137,6 +139,7 @@ root. The archive is not minimalistic but is a good start.
 
 In no specific priority:
 
+* Detect mdadm / lvm2 / cryptsetup module requirements.
 * Allow to configure static IP address.
 * Add more vendors (stay focus on server oriented distros).
 

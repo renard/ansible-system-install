@@ -1,0 +1,24 @@
+# Remove any existing ssh connection and kill ssh server from the
+# chroot environment.
+#
+# This tasks file is called from both stage-1 and stage3.
+
+- name: check for ssh pid in chroot
+  stat:
+    path: '{{ system_install_ssh_chroot_pid }}'
+  register: _system_install_ssh_chroot_pid
+
+- block:
+
+    # Killing sshd does not remove existing active connections.
+    - name: Stop ssh connections in chroot (may safely fail)
+      shell:
+        pkill -P $(cat '{{ system_install_ssh_chroot_pid }}')
+
+    # Now kill the ssh server itself.
+    - name: Stop ssh server in chroot (may safely fail)
+      command:
+        pkill -F '{{ system_install_ssh_chroot_pid }}'
+
+  ignore_errors: yes
+  when: _system_install_ssh_chroot_pid.stat.exists

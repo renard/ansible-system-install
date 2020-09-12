@@ -3,7 +3,7 @@
 # Copyright © 2020 Sébastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 
 # Created: 2020-02-20
-# Last changed: 2020-09-11 00:33:33
+# Last changed: 2020-09-12 13:18:52
 
 # This program is free software. It comes without any warranty, to
 # the extent permitted by applicable law. You can redistribute it
@@ -27,15 +27,6 @@
 #  * The new server has to be declared within a 'install' group in the
 #    inventory. To prevent from doing bad things do not forget to remove the
 #    server from this group after setup completed.
-#
-#
-# Setup is run in 3 stages:
-#
-#   - Install system (debootstrap or a tarball image).
-#   - Customize the system (credentials, base packages, ...)
-#   - Cleanup the install and unmount all filesystems.
-#
-# You need to reboot the remote server yourself.
 #
 
 - hosts: 'install'
@@ -62,61 +53,9 @@
     # system_install_base: []
 
   pre_tasks:
-
-    - name: check for ssh pid in chroot
-      stat:
-        path: '{{ system_install_ssh_chroot_pid }}'
-      register: _system_install_ssh_chroot_pid
-
-    - block:
-
-        # Killing sshd does not remove existing active connections.
-        - name: Stop ssh connections in chroot (may safely fail)
-          shell:
-            pkill -P $(cat '{{ system_install_ssh_chroot_pid }}')
-
-        # Now kill the ssh server itself.
-        - name: Stop ssh server in chroot (may safely fail)
-          command:
-            pkill -F '{{ system_install_ssh_chroot_pid }}'
-
-      ignore_errors: yes
-      when: _system_install_ssh_chroot_pid.stat.exists
-
-  roles:
-    # Install the machine. See system-install role for more customization.
-    - { role: system-install, tags: system-install }
-
-  post_tasks:
-    # Variables are not available between diffrent plays but those stored
-    # using set_fact. Some of them are required later.
-    - name: store persistant facts
-      set_fact:
-        system_install_target: '{{ system_install_target }}'
-        system_install_partitions: '{{ system_install_partitions }}'
-        system_install_pseudo_fs: '{{ system_install_pseudo_fs }}'
-        system_install_ssh_chroot_pid: '{{ system_install_ssh_chroot_pid }}'
-        chroot_python_interpreter: '{{ chroot_python_interpreter | default((system_install_python[system_install_vendor] | default({}))[system_install_vendor_version] | default("/usr/bin/python3")) }}'
-
-    # SSH server keys are not created by default on some distros.
-    #
-    # TODO: check if there is not an easier way to configue sshd keys.
-    - name: create ssh server keys (Centos like)
-      command: |-
-        chroot '{{ system_install_target }}' ssh-keygen \
-        -f '/etc/ssh/ssh_host_{{ item }}_key' -N '' -t '{{ item }}'
-      args:
-        creates: '{{ system_install_target }}/etc/ssh/ssh_host_{{ item }}_key'
-      with_items:
-        - rsa
-        - ecdsa
-        - ed25519
-        
-    # Start ssh server in the chroot to allow the 2nd stage setup
-    - name: start ssh server in chroot
-      command: |-
-        chroot '{{ system_install_target }}' /usr/sbin/sshd -p 2222 \
-        -o PidFile='{{ system_install_ssh_chroot_pid }}'
+    - include_role:
+        name: system-install
+        tasks_from: stage-1/main
 
 ## Second stage
 #
@@ -146,6 +85,11 @@
     #
     ansible_python_interpreter: '{{ chroot_python_interpreter }}'
 
+
+  pre_tasks:
+    - include_role:
+        name: system-install
+        tasks_from: stage-2/main
 
   tasks:
     - name: setup
@@ -184,44 +128,7 @@
     host_key_checking: '{{ host_key_checking | default(False) }}'
 
   post_tasks:
-
-    - name: Remove sshkeys for root in the chroot
-      authorized_key:
-        user: root
-        path: '{{ system_install_target }}/root/.ssh/authorized_keys'
-        key: '{{ item }}'
-        state: absent
-      with_items: '{{ system_install_root_ssh_keys | default([]) }}'
-      when: system_install_remove_root_keys
-
-    # ssh multiplex process is still running in chroot. Kill it before
-    # stopping the ssh server otherwise /dev would not be able to unmounted.
-    - name: Stop ssh connections in chroot
-      shell:
-        pkill -P $(cat '{{ system_install_ssh_chroot_pid }}')
-
-    # Now kill the chrooted ssh server
-    - name: Stop ssh server in chroot
-      command:
-        pkill -F '{{ system_install_ssh_chroot_pid }}'
-        
-    - name: umount pseudo file systems from the chroot target
-      mount:
-        path: '{{ system_install_target }}/{{ item.fs }}'
-        state: unmounted
-      with_items: '{{ system_install_pseudo_fs | reverse | list }}'
-        
-    - name: Unmount target partition
-      mount:
-        path: '{{ system_install_target }}/{{ item.fs }}'
-        state: unmounted
-      with_items: '{{ system_install_partitions | reverse | list }}'
-
-    - name: Reboot message
-      debug:
-        msg: |
-          Now you can reboot {{ inventory_hostname }} and run next pb_base.yml playbook.
-
-            ssh {{ inventory_hostname }} sudo reboot
-            ./pb_base.yml -l {{ inventory_hostname }}
+    - include_role:
+        name: system-install
+        tasks_from: stage-3/main
     

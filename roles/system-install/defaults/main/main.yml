@@ -87,31 +87,3 @@ system_install_filesystem: xfs
 #
 system_install_setup_storage_conf: tmp/setup-storage.conf
 
-
-# ## Partition scheme
-# #
-# # By default install the system in the whole disk. See ansible "parted"
-# # module and parted(1) manpage for further details.
-# #
-# # This setup works in most cases but YMMV.
-# system_install_partitions:
-#   - name: OS
-#     number: 1
-#     part_start: 4096s
-#     part_end: 100%
-#     flags:
-#       - boot
-#       - esp
-#     filesystem:
-#       force: yes
-#       fstype: '{{ system_install_filesystem }}'
-#       opts: '-L SYSTEM {{ (system_install_xfs_opts[system_install_vendor] | default({}))[system_install_vendor_version] | default("") }}'
-#         #-m crc=0,finobt=0 -i sparse=0 -n ftype=0
-#     mount:
-#       path: /
-#   - name: grub
-#     number: 2
-#     part_start: 2048s
-#     part_end: 4095s
-#     flags:
-#       - bios_grub

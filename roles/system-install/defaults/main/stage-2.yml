@@ -1,0 +1,20 @@
+## Disable systemd-resolved.
+#
+# Set to true if you want your system resolver be handeled by resolvconf
+# instead of systemd-resolved.
+#
+# Only compatible with Debian-based distributions.
+#
+# See tasks/stage-2/debian/systemd-resolved.yml for further details.
+#
+system_install_fix_systemd_resolved: true
+
+## Disable systemd-networkd
+#
+# Set to true if you use good-old ifupdown package instead of
+# systemd-networkd.
+#
+# Only compatible with Debian-based distributions.
+#
+# See tasks/stage-2/debian/systemd-networkd.yml for further details.
+system_install_fix_systemd_networkd: true

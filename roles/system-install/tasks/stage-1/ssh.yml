@@ -1,0 +1,19 @@
+# SSH server keys are not created by default on some distros.
+#
+# TODO: check if there is not an easier way to configue sshd keys.
+- name: create ssh server keys (Centos like)
+  command: |-
+    chroot '{{ system_install_target }}' ssh-keygen \
+    -f '/etc/ssh/ssh_host_{{ item }}_key' -N '' -t '{{ item }}'
+  args:
+    creates: '{{ system_install_target }}/etc/ssh/ssh_host_{{ item }}_key'
+  with_items:
+    - rsa
+    - ecdsa
+    - ed25519
+    
+# Start ssh server in the chroot to allow the 2nd stage setup
+- name: start ssh server in chroot
+  command: |-
+    chroot '{{ system_install_target }}' /usr/sbin/sshd -p 2222 \
+    -o PidFile='{{ system_install_ssh_chroot_pid }}'

@@ -12,20 +12,20 @@
 #     ].pkg") | list
 #     }}'
 
-- include_tasks: bootstrap-centos.yml
+- include_tasks: stage-1/bootstrap/centos.yml
   when: system_install_vendor in ['centos']
 
-- include_tasks: bootstrap-fedora.yml
+- include_tasks: stage-1/bootstrap/fedora.yml
   when: system_install_vendor in ['fedora']
 
-- include_tasks: bootstrap-opensuse.yml
+- include_tasks: stage-1/bootstrap/opensuse.yml
   when: system_install_vendor in ['opensuse']
     
-- include_tasks: bootstrap-debian.yml
+- include_tasks: stage-1/bootstrap/debian.yml
   when: system_install_vendor in [ 'debian', 'ubuntu' ]
 
-- include_tasks: bootstrap-alpine.yml
+- include_tasks: stage-1/bootstrap/alpine.yml
   when: system_install_vendor == 'alpine'
 
-- include_tasks: bootstrap-arch.yml
+- include_tasks: stage-1/bootstrap/arch.yml
   when: system_install_vendor == 'arch'

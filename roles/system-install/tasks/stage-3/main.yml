@@ -1,0 +1,31 @@
+
+- name: Remove sshkeys for root in the chroot
+  authorized_key:
+    user: root
+    path: '{{ system_install_target }}/root/.ssh/authorized_keys'
+    key: '{{ item }}'
+    state: absent
+  with_items: '{{ system_install_root_ssh_keys | default([]) }}'
+  when: system_install_remove_root_keys
+
+- include: cleanup-sshd.yml
+
+- name: umount pseudo file systems from the chroot target
+  mount:
+    path: '{{ system_install_target }}/{{ item.fs }}'
+    state: unmounted
+  with_items: '{{ system_install_pseudo_fs | reverse | list }}'    
+
+- name: Unmount target partition
+  mount:
+    path: '{{ system_install_target }}/{{ item.path }}'
+    state: unmounted
+  with_items: '{{ system_install_partitions | reverse | list }}'
+    
+- name: Reboot message
+  debug:
+    msg: |
+      Now you can reboot {{ inventory_hostname }} and run next pb_base.yml playbook.
+
+        ssh {{ inventory_hostname }} sudo reboot
+        ./pb_base.yml -l {{ inventory_hostname }}

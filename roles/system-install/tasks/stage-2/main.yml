@@ -1,0 +1,2 @@
+- include_tasks: stage-2/debian.yml
+  when: system_install_vendor in [ 'debian', 'ubuntu' ]

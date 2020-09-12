@@ -1,0 +1,68 @@
+---
+
+# Systemd runs systemd-resolved which silently overrides (at least) dhcp
+# domain-name-servers and domain-search artibutes and is very slow.
+#
+# To prevent systemd from breaking good old working solutions, the
+# /etc/dhcp/dhclient-enter-hooks.d/resolved needs to be ignored by dhclient
+# hooks. One solution consists of adding "return" at the very begining of
+# this file. One other solution consists of deleting the file (or moving it
+# to a disabled folder). The 2nd solution is way more robust since
+# dpkg-divert ensure future update won't break this fix.
+#
+# Then both resolvconf-pull-resolved.path and systemd-resolved.service can
+# be disabled.
+#
+# https://github.com/systemd/systemd/issues/6224
+# https://askubuntu.com/questions/1081832
+# https://gist.github.com/zoilomora/f7d264cefbb589f3f1b1fc2cea2c844c
+# https://answers.launchpad.net/ubuntu/+question/685512
+# 
+
+- name: install resolvconf package
+  apt:
+    pkg: resolvconf
+    update_cache: yes
+    cache_valid_time: 3600
+    install_recommends: no
+
+- name: remove libnss-resolve package
+  apt:
+    pkg: libnss-resolve    
+    state: absent
+    purge: yes
+
+- name: check /etc/dhcp/dhclient-enter-hooks.d/resolved
+  stat:
+    path: /etc/dhcp/dhclient-enter-hooks.d/resolved
+  ignore_errors: True
+  register: _system_install_fix_systemd_resolved
+  
+- block:
+
+    - name: Create trashed directory for systemd-resolved
+      file:
+        path: /etc/dhcp/.dhclient-enter-hooks.disabled
+        state: directory
+
+    - name: Divert /etc/dhcp/dhclient-enter-hooks.d/resolved
+      command: |-        
+        /usr/bin/dpkg-divert --add --rename --divert \
+        /etc/dhcp/.dhclient-enter-hooks.disabled/resolved \
+        /etc/dhcp/dhclient-enter-hooks.d/resolved
+      ignore_errors: True
+      
+  when: _system_install_fix_systemd_resolved.stat.exists
+
+
+- name: disabling systemd-resolved
+  systemd:
+    name: '{{ item }}'
+    state: stopped
+    enabled: no
+    masked: yes
+  with_items:
+    - resolvconf-pull-resolved.path
+    - systemd-resolved.service
+
+
