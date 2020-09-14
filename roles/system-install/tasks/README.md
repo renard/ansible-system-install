@@ -21,20 +21,33 @@ installation using FAI's
 [setup-storage](https://wiki.fai-project.org/index.php/Setup-storage). All
 data will be removed. It tries to unmount existing partitions and free
 hard drives, however if some resources such as RAID devices are still
-in use this stage will fail.
+in use this stage will fail with error like:
+
+```
+(STDERR) mdadm: Cannot get exclusive access to /dev/md127:Perhaps a running process, mounted filesystem or active volume group?
+```
+
+Check all found devices using `/usr/lib/fai/fai-disk-info`.
 
 If any RAID device is in use, you can do:
 
 ```
-awk '{if($3=="active"){print "/dev/"$1}}' /proc/mdstat \
-  | xargs --no-run-if-empty mdadm --stop
+mdadm --stop --scan
 ```
 
 If any LVM device is in use, you can do:
 
 ```
-vgchange -an
-pvremove /dev/md0 --force --force
+ls /dev/mapper/ | grep -v control | xargs --no-run-if-empty dmsetup remove
+```
+
+If errors still persist you can try commands like:
+
+```
+mdadm --remove /dev/md*
+wipefs -af /dev/vd*
+dd if=/dev/zero of=/dev/vda bs=1k count=10240
+partprobe -s
 ```
 
 After filesystem creation the target OS in installed using different

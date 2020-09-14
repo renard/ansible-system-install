@@ -3,7 +3,7 @@
 # Copyright © 2020 Sébastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 
 # Created: 2020-02-20
-# Last changed: 2020-09-12 13:18:52
+# Last changed: 2020-09-15 00:10:33
 
 # This program is free software. It comes without any warranty, to
 # the extent permitted by applicable law. You can redistribute it
@@ -76,29 +76,13 @@
   vars:
     ansible_ssh_port: '{{ ssh_port | default(2222) }}'
     host_key_checking: '{{ host_key_checking | default(False) }}'
-    # Some old system such as CentOS 7 do not have all python3
-    # requirements. In that case the python interpreter can be forced
-    # within th chroot ebvironment:
-    #
-    #   time ./pb_bootstrap-ssh.yml -l centos7 \
-    #      -e chroot_python_interpreter='/usr/bin/python'
-    #
     ansible_python_interpreter: '{{ chroot_python_interpreter }}'
 
 
-  pre_tasks:
+  tasks:
     - include_role:
         name: system-install
         tasks_from: stage-2/main
-
-  tasks:
-    - name: setup
-      setup:
-      register: setup
-
-    - name: setup
-      debug:
-        msg: '{{ setup["ansible_facts"] }}'
 
     
   # # Configure roles that suit your need here. 

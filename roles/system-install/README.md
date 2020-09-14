@@ -77,7 +77,35 @@ system after the reboot from hard drive.
 
 ## Configuration
 
+Link [roles/playbook-system-install.yml]() to your Ansible playbooks
+directory.
+
 See specific documentation in defaults files in [defaults/main]().
+
+## Invocation
+
+Run:
+
+```
+./playbook-system-install.yml [ -u user ] -l hostname [ -e VAR="value" ]
+```
+
+All variables from the [defaults/main]() files can be set on the
+command line as well. For convenience some other variables can be set
+from the command line using the `-e` option (can be specified multiple
+times):
+
+* `password`: SSH password on remote live system (not on the chrooted
+  environment). Use this if you cannot use a ssh key. Unset by default.
+* `host_key_checking`: Set to *true* if ssh host key should be
+  verified. Default value is *false*.
+* `system_install_base`: URL to download a base system archive. If set
+  OS bootstraping is disabled. Default is unset.
+* `ssh_port`: SSH port within the chroot. Default is 2222.
+* `chroot_python_interpreter`: python interpreter within the
+  chroot. By default this value is auto-computed for each vendor and
+  version however it can be overridden from the command line.
+
 
 ## Extra
 
