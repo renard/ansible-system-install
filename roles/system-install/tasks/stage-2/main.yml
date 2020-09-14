@@ -1,2 +1,19 @@
 - include_tasks: stage-2/debian.yml
   when: system_install_vendor in [ 'debian', 'ubuntu' ]
+
+- name: Run additionnal roles
+  include_role:
+    allow_duplicates: '{{ __si_item.allow_duplicates | default(True) }}'
+    # Following line does not work and returns:
+    # ERROR! Expected a dict for apply but got <class 'ansible.parsing.yaml.objects.AnsibleUnicode'> instead
+    #
+    # apply: '{{ __si_item.apply | default({}) }}'
+    defaults_from: '{{ __si_item.defaults_from | default("main") }}'
+    handlers_from: '{{ __si_item.handlers_from | default("main") }}'
+    name: '{{ __si_item.name }}'
+    public: '{{ __si_item.allow_duplicates | default(False) }}'
+    tasks_from: '{{ __si_item.tasks_from | default("main") }}'
+    vars_from: '{{ __si_item.vars_from | default("main") }}'
+  with_items: '{{ system_install_roles }}'
+  loop_control:
+    loop_var: __si_item
