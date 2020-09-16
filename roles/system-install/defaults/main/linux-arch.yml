@@ -15,3 +15,6 @@ system_install_arch_packages:
   - pkg: sudo
   #- pkg: netctl
   - pkg: python
+
+  - pkg: lvm2
+  - pkg: mdadm

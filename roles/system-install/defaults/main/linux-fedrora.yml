@@ -37,5 +37,5 @@ system_install_fedora_packages:
   - pkg: dnf
   - pkg: tar
   - pkg: bash
-
-
+  - pkg: mdadm
+  - pkg: lvm2

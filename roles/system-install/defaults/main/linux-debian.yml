@@ -51,9 +51,9 @@ system_install_debian_packages:
   - pkg: isc-dhcp-client
   - pkg: xfsprogs
   # #
-  # - pkg: cryptsetup
   # - pkg: busybox
   # - pkg: dropbear
   # - pkg: lsb-release
   - pkg: mdadm
   - pkg: lvm2
+  - pkg: cryptsetup

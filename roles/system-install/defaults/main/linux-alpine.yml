@@ -38,3 +38,5 @@ system_install_alpine_packages:
   - pkg: dhclient
   - pkg: sudo
   - pkg: tar
+  - pkg: mdadm
+  - pkg: lvm2

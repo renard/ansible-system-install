@@ -40,4 +40,6 @@ system_install_opensuse_packages:
   - pkg: tar
   - pkg: bash
 
+  - pkg: mdadm
+  - pkg: lvm2
 

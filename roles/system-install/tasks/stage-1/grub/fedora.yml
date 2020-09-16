@@ -1,5 +1,9 @@
 ---
 
+- name: update initrd (Centos)
+  shell:
+    chroot '{{ system_install_target }}' dracut -fv --kver $(ls '{{ system_install_target }}/lib/modules' | head -n1)
+
 - name: Copy grub configuration (Fedora)
   copy:
     src: etc/default/grub

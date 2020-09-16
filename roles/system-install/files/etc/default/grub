@@ -1,7 +1,8 @@
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=5
 #GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`
-GRUB_CMDLINE_LINUX_DEFAULT="verbose net.ifnames=0"
+GRUB_CMDLINE_LINUX_DEFAULT="verbose net.ifnames=0 rd.auto"
 GRUB_CMDLINE_LINUX=""
 GRUB_TERMINAL=console
 GRUB_RECORDFAIL_TIMEOUT=5
+#GRUB_PRELOAD_MODULES="raid lvm"

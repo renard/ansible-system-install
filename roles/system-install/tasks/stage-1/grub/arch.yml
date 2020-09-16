@@ -34,6 +34,11 @@
 #   shell:
 #     chroot '{{ system_install_target }}' mkinitcpio -k $(ls '{{ system_install_target }}'/lib/modules/)
 
+- name: update initfs
+  shell:
+    chroot '{{ system_install_target }}' mkinitcpio -p linux-lts -c /etc/mkinitcpio.conf
+
+
 ## Basic grub setup.
 #
 - name: Configure grub

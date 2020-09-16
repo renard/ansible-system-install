@@ -61,3 +61,5 @@ system_install_centos_packages:
   - pkg: dnf
   - pkg: tar
   - pkg: bash
+  - pkg: mdadm
+  - pkg: lvm2
