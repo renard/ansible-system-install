@@ -13,13 +13,38 @@
     install_recommends: no
     cache_valid_time: 3600
 
-- name: Patch setup-storage to get a list of boot devices
+- name: Patch setup-storage
   patch:
-    src: usr/sbin/setup-storage.patch
-    dest: /usr/sbin/setup-storage
-    strip: 0
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    strip: '{{ item.strip | default(0) }}'
     remote_src: False
-      
+  with_items:
+    - src: usr/sbin/setup-storage.patch
+      dest: /usr/sbin/setup-storage
+    - src: usr/sbin/setup-storage-2.patch
+      dest: /usr/sbin/setup-storage
+
+- name: Copy setup-storage configuration file
+  template:
+    src: '{{ system_install_setup_storage_conf }}'
+    dest: /tmp/setup-storage.conf
+    validate: setup-storage -s -f %s
+
+# disk_var is required to install grub later
+- name: Generate fstab and disk_var files
+  block:
+    - command:
+        setup-storage -f /tmp/setup-storage.conf -y
+  rescue:
+    - fail:
+        msg: |-
+            Hard drives seem to be blank. system-install must be run
+            with system_install_skip_partition set to no (use cli
+            option: "-e system_install_skip_partition=no").
+        
+  when: system_install_skip_partition
+        
 - name: Partition the hard drive
   block:
 
@@ -48,22 +73,25 @@
         state: unmounted
       with_items: '{{ (_system_install_mounted.stdout_lines | default([])) | list }}'
 
-    - name: Copy setup-storage configuration file
-      template:
-        src: '{{ system_install_setup_storage_conf }}'
-        dest: /tmp/setup-storage.conf
-        validate: setup-storage -s -f %s
-      
-    ## In case of failure stop md / lvm etc... devices
-    #
-    #   mdadm --stop /dev/md0
-    #
+    - name: Copy filesystem cleanup script
+      copy:
+        src: usr/local/sbin/clean-devices
+        dest: /usr/local/sbin/clean-devices
+        mode: '0700'
+        owner: root
+        group: root
+
+    # Remove all LVM / RAID settings
+    - name: cleanup all devices
+      command: /usr/local/sbin/clean-devices
+        
     - name: Create filesystems
       command:
         setup-storage -f /tmp/setup-storage.conf -X -y
 
   when: not system_install_skip_partition
 
+    
 - name: Mount partitions from the hard drive
   block:
 

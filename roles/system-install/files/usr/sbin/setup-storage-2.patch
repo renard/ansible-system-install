@@ -1,0 +1,11 @@
+--- a/setup-storage	2020-09-17 00:56:09.612043137 +0200
++++ b/setup-storage	2020-09-17 00:55:38.216095342 +0200
+@@ -244,6 +244,9 @@
+ `$FAI::udev_settle`;
+ my @fstab = &FAI::generate_fstab(\%FAI::configs);
+
++# We want to write disk_vars, fstab an crypttab files.
++$FAI::no_dry_run=1;
++
+ # print fstab
+ $FAI::debug and print "$_\n" foreach (@fstab);

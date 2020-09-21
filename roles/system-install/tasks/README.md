@@ -20,35 +20,11 @@ This stage starts to create a filesystem for the future OS
 installation using FAI's
 [setup-storage](https://wiki.fai-project.org/index.php/Setup-storage). All
 data will be removed. It tries to unmount existing partitions and free
-hard drives, however if some resources such as RAID devices are still
-in use this stage will fail with error like:
+hard drives, however if some resources such as RAID devices.
 
-```
-(STDERR) mdadm: Cannot get exclusive access to /dev/md127:Perhaps a running process, mounted filesystem or active volume group?
-```
-
-Check all found devices using `/usr/lib/fai/fai-disk-info`.
-
-If any RAID device is in use, you can do:
-
-```
-mdadm --stop --scan
-```
-
-If any LVM device is in use, you can do:
-
-```
-ls /dev/mapper/ | grep -v control | xargs --no-run-if-empty dmsetup remove
-```
-
-If errors still persist you can try commands like:
-
-```
-mdadm --remove /dev/md*
-wipefs -af /dev/vd*
-dd if=/dev/zero of=/dev/vda bs=1k count=10240
-partprobe -s
-```
+Caution: the `/usr/local/sbin/clean-devices` destoys all RAID, LVM and
+partitions from all devices found by
+`/usr/lib/fai/fai-disk-info`. There is no way to retreive any data.
 
 After filesystem creation the target OS in installed using different
 tools depending on the OS to install (`debootstrap` for Debian based,

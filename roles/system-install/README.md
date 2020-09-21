@@ -14,6 +14,13 @@ install [Debian](https://debian.org), [Ubuntu](https://ubuntu.com/),
 [Alpine](https://alpinelinux.org/), and
 [Archlinux](https://www.archlinux.org/) distributions.
 
+## Warning - Danger zone
+
+Using this role is dangerous. It destroy any existing data from all
+drives found on the remote system without any confirmation. Do not use
+if you have any data on the remote machine. There is absolutely no way
+to recover deleted data. This role has no brain, use your own.
+
 ## Prerequisite
 
 You will need to boot your server using a live CD or use a PXE boot

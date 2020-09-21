@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Remove all LVM / RAID (mdadm) devices on local machine.
+#
+# WARNING: THIS SCRIPT IS DANGEROUS SINCE IT DETROYS ALL YOUR DATA
+# WITHOUT ANY SORT OF CONFIRMATION.
+#
+# The main reason for this script is because setup-sotrage fails to
+# remove LVM on top of RAID or RAID on top of LVM.
+#
+# See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=970455
+
+
+
+function remove_all_lvm() {
+    dmsetup --noheadings info -C -o name | xargs --no-run-if-empty dmsetup remove
+}
+
+function remove_all_mdraid() {
+    mdadm --stop --scan
+}
+
+# Following act only on active devices, those handled by dmsetup or
+# mdadm.
+#
+# First try to remove LVM devices. This is the case if LVM is on top
+# of RAID.
+#
+# If it fails chances are that a mdadm device is using lvm
+# volumes. This is the case if RAID is on top of LVM.
+#
+# If LVM have been removed properly, the RAID can be removed as well.
+remove_all_lvm
+if test $? -eq 123; then
+    remove_all_mdraid
+    remove_all_lvm
+else
+    remove_all_mdraid
+fi
+
+# Now wipe all existing partitions on devices found by fai-disk-info,
+# delete the first 10Mb (remove partition table and some partition
+# signature).
+#
+# Finaly inform the kernel of partition change. Limit to found devices
+# because partprobe fails on read only (CDROM) devices if booted from
+# and ISO image.
+devices=$(/usr/lib/fai/fai-disk-info)
+echo "$devices" | sed 's,^,/dev/,' | xargs wipefs -af
+echo "$devices" | sed 's,^,of=/dev/,' | xargs -n1 dd if=/dev/zero bs=1k count=10240
+echo "$devices" | sed 's,^,/dev/,' | xargs partprobe -s
+
