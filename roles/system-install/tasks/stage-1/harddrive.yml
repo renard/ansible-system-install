@@ -81,6 +81,14 @@
         owner: root
         group: root
 
+    - name: Deploy ignore drives
+      template:
+        src: etc/clean-devices.conf
+        dest: /etc/clean-devices.conf
+        mode: '0400'
+        owner: root
+        group: root
+
     # Remove all LVM / RAID settings
     - name: cleanup all devices
       command: /usr/local/sbin/clean-devices

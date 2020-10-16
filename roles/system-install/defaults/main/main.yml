@@ -67,12 +67,36 @@ system_install_grub_linux_default:
 #
 system_install_target: /srv
 
+## Skip device cleanup
+#
+# List all devices that should be ignored by clean-devices. Use this
+# if your system booted from USB and you don't want to erase your USB
+# key.
+#
+# Use device name without the /dev/ prefix.
+#
+# Example:
+#    system_install_skip_clean_devices:
+#      - sdb
+#      - sdd
+#
+# TODO: Find a way to detect USB boot device.
+#
+system_install_skip_clean_devices: []
+
 ## Skip hard drive partition
 #
 # If set to true, all hardrive partitionning and formating will be skipped.
 #
 system_install_skip_partition: true
 
+## Deploy crypttab
+#
+# If true, copy crypttab to the new installed system. If /etc/crypttab
+# is present on a system, init stripts will ask for the key to unloack
+# encrypted file systems, which may be incompatible with headless
+# servers.
+system_install_deploy_crypttab: false
 
 ## Root file system
 #

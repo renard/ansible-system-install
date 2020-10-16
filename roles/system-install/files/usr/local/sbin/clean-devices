@@ -10,7 +10,9 @@
 #
 # See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=970455
 
-
+if test -e /etc/clean-devices.conf; then
+    . /etc/clean-devices.conf
+fi
 
 function remove_all_lvm() {
     dmsetup --noheadings info -C -o name | xargs --no-run-if-empty dmsetup remove
@@ -18,7 +20,16 @@ function remove_all_lvm() {
 
 function remove_all_mdraid() {
     mdadm --stop --scan
+    # Cleanup mdadm data to prevent from having errors such as:
+    #    mdadm: cannot open /dev/sda2: Device or resource busy
+    for d in $devices; do
+	mdadm --zero-superblock /dev/$d*
+    done
 }
+
+# Search for all partitions
+devices=$(/usr/lib/fai/fai-disk-info | grep -v "^$SKIP_DEVICES\$")
+
 
 # Following act only on active devices, those handled by dmsetup or
 # mdadm.
@@ -45,7 +56,6 @@ fi
 # Finaly inform the kernel of partition change. Limit to found devices
 # because partprobe fails on read only (CDROM) devices if booted from
 # and ISO image.
-devices=$(/usr/lib/fai/fai-disk-info)
 echo "$devices" | sed 's,^,/dev/,' | xargs wipefs -af
 echo "$devices" | sed 's,^,of=/dev/,' | xargs -n1 dd if=/dev/zero bs=1k count=10240
 echo "$devices" | sed 's,^,/dev/,' | xargs partprobe -s
