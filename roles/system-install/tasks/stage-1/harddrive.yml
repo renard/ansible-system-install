@@ -126,4 +126,5 @@
         path: '{{ system_install_target }}/{{ item.path }}'
         fstype: '{{ item.fstype }}'
         state: mounted
+      when: item.path not in [ 'none' ]
       with_items: '{{ system_install_partitions }}'
