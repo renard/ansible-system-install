@@ -6,6 +6,14 @@
     dest: '{{ system_install_target }}/etc/fstab'
     remote_src: yes
 
+- name: copy crypttab to chroot
+  copy:
+    src: /tmp/fai/crypttab
+    dest: '{{ system_install_target }}/etc/crypttab'
+    remote_src: yes
+  failed_when: false
+  when: system_install_deploy_crypttab
+
 - include_tasks: stage-1/grub/debian.yml
   when: system_install_vendor in [ 'debian', 'ubuntu' ]
 
