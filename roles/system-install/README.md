@@ -126,12 +126,13 @@ root. The archive is not minimalistic but is a good start.
 
 | Version                | Status | EOL                            | Restrictions      |
 |------------------------|--------|--------------------------------|-------------------|
+| **Debian**             |        |                                |                   |
 | Debian 8 (jessie)      | OK     | 2020-06                        | [^py2] [^xfs]     |
 | Debian 9 (stretch)     | OK     | 2022-06                        | [^xfs]            |
 | Debian 10 (buster)     | OK     | 2024                           |                   |
 | Debian 11 (bullseye)   | OK     | TBA                            |                   |
 | Debian 12 (bookworm)   | N/A    | TBA                            | Not yet available |
-|                        |        |                                |                   |
+| **Ubuntu**             |        |                                |                   |
 | Ubuntu 14.04 (trusty)  | OK     | LTS: 2019-04-30 / EMS: 2022-04 | [^py2] [^xfs]     |
 | Ubuntu 14.10 (utopic)  |        | 2015-07-23                     | Do not use        |
 | Ubuntu 15.04 (vivid)   |        | 2016-02-04                     | Do not use        |
@@ -146,22 +147,22 @@ root. The archive is not minimalistic but is a good start.
 | Ubuntu 19.10 (eoan)    |        | 2020-07-17                     | Do not use        |
 | Ubuntu 20.04 (focal)   | OK     | LTS: 2025-04 / EMS: 2030-04    |                   |
 | Ubuntu 20.10 (groovy)  |        | 2021-07                        |                   |
-|                        |        |                                |                   |
+| **CentOS**             |        |                                |                   |
 | CentOS 7               | OK     | 2024-06-30                     |                   |
 | CentOS 8               | OK     | 2029-05-31                     |                   |
-|                        |        |                                |                   |
+| **Fedora**             |        |                                |                   |
 | Fedora 31              | OK     | N/A                            |                   |
 | Fedora 32              | OK     | N/A                            |                   |
 | Fedora 33              | N/A    | N/A                            |                   |
-|                        |        |                                |                   |
+| **OpenSUSE**           |        |                                |                   |
 | OpenSUSE 15.1          | OK     | 2020-11-22                     |                   |
 | OpenSUSE 15.2          | OK     | 2021-12-31                     |                   |
-|                        |        |                                |                   |
+| **Alpine**             |        |                                |                   |
 | Alpine 3.9             | OK     | 2020-11-01                     |                   |
 | Alpine 3.10            | OK     | 2021-05-01                     |                   |
 | Alpine 3.11            | OK     | 2021-11-01                     |                   |
 | Alpine 3.12            | OK     | 2022-05-01                     |                   |
-|                        |        |                                |                   |
+| **Archlinux**          |        |                                |                   |
 | Archlinux 2020.07.01   | OK     | N/A                            |                   |
 | Archlinux 2020.08.01   | OK     | N/A                            |                   |
 | Archlinux 2020.09.01   | OK     | N/A                            |                   |
@@ -169,6 +170,22 @@ root. The archive is not minimalistic but is a good start.
 
 [^py2]: See [vars/main.yml]() for python support in chroot.
 [^xfs]: See [vars/main.yml]() for xfs options support.
+
+Versions history references:
+
+* [Alpine](https://wiki.alpinelinux.org/wiki/Alpine_Linux:Releases),
+  [wikipedia](https://en.wikipedia.org/wiki/Alpine_Linux#Version_history)
+* [Archlinux](https://www.archlinux.org/releng/releases/)
+* [CentOS](https://www.centos.org/download/),
+  [wikipedia](https://en.wikipedia.org/wiki/CentOS#End-of-support_schedule)
+* [Debian](https://wiki.debian.org/DebianReleases#Production_Releases),
+  [wikipedia](https://en.wikipedia.org/wiki/Debian_version_history#Release_table)
+* [Fedora](https://fedoraproject.org/wiki/Releases),
+  [wikipedia](https://en.wikipedia.org/wiki/Fedora_version_history#Version_history)
+* [OpenSUSE](https://en.opensuse.org/Lifetime),
+  [wikipedia](https://en.wikipedia.org/wiki/OpenSUSE_version_history#Version_history)
+* [Ubuntu](https://wiki.ubuntu.com/Releases),
+  [wikipedia](https://en.wikipedia.org/wiki/Ubuntu_version_history#Table_of_versions)
 
 ## Todo / roadmap
 
