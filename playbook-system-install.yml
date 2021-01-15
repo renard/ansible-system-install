@@ -3,7 +3,7 @@
 # Copyright © 2020 Sébastien Gross <seb•ɑƬ•chezwam•ɖɵʈ•org>
 
 # Created: 2020-02-20
-# Last changed: 2020-09-15 00:10:33
+# Last changed: 2021-01-15 02:45:21
 
 # This program is free software. It comes without any warranty, to
 # the extent permitted by applicable law. You can redistribute it
@@ -80,20 +80,10 @@
 
 
   tasks:
-    - include_role:
+    - name: running stage 2
+      include_role:
         name: system-install
         tasks_from: stage-2/main
-
-    
-  # # Configure roles that suit your need here. 
-  # roles:
-  #   # - { role: apt, tags: apt }
-  #   # - { role: etckeeper, tags: etckeeper }
-  #   #- { role: system-install-fix, tags: system-install-fix }
-  #   - { role: base, tags: base }
-  #   # - { role: credentials, tags: credentials }
-  #   # - { role: isc-dhcp-client, tags: isc-dhcp-client }
-    
 
 ## Third stage
 #
