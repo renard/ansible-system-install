@@ -25,7 +25,12 @@
 - name: Reboot message
   debug:
     msg: |
-      Now you can reboot {{ inventory_hostname }} and run next pb_base.yml playbook.
-
+      Now you can reboot {{ inventory_hostname }}:
         ssh {{ inventory_hostname }} sudo reboot
-        ./pb_base.yml -l {{ inventory_hostname }}
+  when: not system_install_reboot
+
+- name: Reboot host (may safely hang, timeout and fail)
+  command:
+    reboot -f
+  failed_when: false
+  when: system_install_reboot

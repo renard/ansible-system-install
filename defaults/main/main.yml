@@ -125,3 +125,10 @@ system_install_setup_storage_conf: tmp/setup-storage.conf
 #   ERROR! Expected a dict for apply but got <class 'ansible.parsing.yaml.objects.AnsibleUnicode'> instead
 #
 system_install_roles: []
+
+## Reboot server after system is installed.
+#
+# Please note that since remote host reboots this task will timeout an
+# fail.
+#
+system_install_reboot: false
